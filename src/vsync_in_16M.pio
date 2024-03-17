@@ -1,0 +1,39 @@
+
+.program vsync_in_16M
+
+
+.wrap_target
+
+; SYNC PULSE
+wait 0 pin 0  ;0/1          ; polarity 16MHz:- , 14MHz:+
+wait 1 pin 0  ;1/0
+irq 6
+nop [1]
+irq clear 6
+
+irq 5                       ; vsync active mode
+
+.wrap
+
+
+
+% c-sdk {
+static inline void vsync_in_16M_program_init(PIO pio, uint sm, uint offset, uint pin) {
+
+    pio_sm_config c = vsync_in_16M_program_get_default_config(offset);
+
+    sm_config_set_in_pins(&c, pin);
+
+    sm_config_set_clkdiv(&c, 4);
+
+    pio_gpio_init(pio, pin);
+    gpio_pull_up(pin);
+
+    // pin direction: input
+    pio_sm_set_consecutive_pindirs(pio, sm, pin, 1, false);
+
+    pio_sm_init(pio, sm, offset, &c);
+
+    // pio_sm_set_enabled(pio, sm, true);
+}
+%}

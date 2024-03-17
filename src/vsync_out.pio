@@ -1,0 +1,61 @@
+
+.program vsync
+.side_set 1 opt             ; 5-2 bits left for delays
+
+.define  VSP 1              ;  VGA:1  EGA:0
+.define nVSP 0              ;  VGA:0  EGA:1
+
+pull block                  ; FIFO to OSR: V_ACTIVE = number of lines
+
+.wrap_target
+
+; ACTIVE
+mov x, osr                  ; Copy value from OSR to x scratch register
+active:
+    wait 1 irq 0            ; Wait for hsync to go high
+    irq 1                   ; Signal active mode
+    jmp x-- active          ; Remain in active mode, decrementing counter
+
+set y, 29  ;30-1            ; FP:36-6 SYNC:2 BP:57+6
+
+; FP
+frontporch:
+    wait 1 irq 0
+    jmp y-- frontporch
+
+; SYNC PULSE                ; 2 lines
+wait 1 irq 0   side VSP
+wait 1 irq 0   side VSP
+
+; BP                        ; (4+1)*(6+1)=35 , (2+1)*(18+1)=57  57+(36-30)=63=3*21
+set x, 2
+bp_loop1:
+    set y, 21
+bp_loop2:
+    wait 1 irq 0  side nVSP
+    jmp y-- bp_loop2
+    jmp x-- bp_loop1
+
+.wrap
+
+
+
+% c-sdk {
+static inline void vsync_program_init(PIO pio, uint sm, uint offset, uint pin, float clk) {
+
+    pio_sm_config c = vsync_program_get_default_config(offset);
+
+    sm_config_set_set_pins(&c, pin, 1);
+    sm_config_set_sideset_pins(&c, pin);
+    sm_config_set_clkdiv(&c, clk);
+
+    pio_gpio_init(pio, pin);
+    
+    // pin direction: output
+    pio_sm_set_consecutive_pindirs(pio, sm, pin, 1, true);
+
+    pio_sm_init(pio, sm, offset, &c);
+
+    // pio_sm_set_enabled(pio, sm, true);
+}
+%}

@@ -1,0 +1,50 @@
+
+.program hsync
+
+
+.define  HSP 0              ;  VGA:0  EGA:1
+.define nHSP 1              ;  VGA:1  EGA:0
+
+pull block                  ; Pull from FIFO to OSR (only happens once)
+
+.wrap_target                ; Program wraps to here
+
+; ACTIVE+FP
+mov x, osr                  ; Copy value from OSR to x scratch register
+activeporch:
+   jmp x-- activeporch      ; Remain high in active mode and front porch
+
+set y, 3                    ; adds to active porch
+
+; SYNC
+pulse:
+    set pins, HSP [25]
+    jmp y-- pulse           ; (3+1)*(1+25+1)=4*27=108
+
+; BP
+set pins, nHSP [31]         ; 32
+nop    [21]                 ; 22
+irq 0  [5]                  ; 1+5  signal end of sync
+
+.wrap
+
+
+
+% c-sdk {
+static inline void hsync_program_init(PIO pio, uint sm, uint offset, uint pin, float clk) {
+
+    pio_sm_config c = hsync_program_get_default_config(offset);
+
+    sm_config_set_set_pins(&c, pin, 1);
+    sm_config_set_clkdiv(&c, clk);
+
+    pio_gpio_init(pio, pin);
+    
+    // pin direction: output
+    pio_sm_set_consecutive_pindirs(pio, sm, pin, 1, true);
+
+    pio_sm_init(pio, sm, offset, &c);
+
+    // pio_sm_set_enabled(pio, sm, true);
+}
+%}

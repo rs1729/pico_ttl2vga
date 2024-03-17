@@ -1,0 +1,45 @@
+
+.program rgb
+
+
+pull block                  ; Pull from FIFO to OSR (only once)
+mov y, osr                  ; Copy value from OSR to y scratch register
+
+.wrap_target
+
+set pins, 0                 ; Zero (consecutive) RGB pins in blanking
+mov x, y                    ; Initialize counter variable
+
+wait 1 irq 1 [6]            ; Wait for vsync active mode (starts 8 cycles after execution)
+
+colorout:                   ; 4 cycles/pix
+    pull block              ; Pull 6 color byte
+    out pins, 6 [1]
+    jmp x-- colorout        ; Stay here thru horizontal active mode
+
+.wrap
+
+
+
+% c-sdk {
+static inline void rgb_program_init(PIO pio, uint sm, uint offset, uint pin, float clk) {
+
+    pio_sm_config c = rgb_program_get_default_config(offset);
+
+    sm_config_set_set_pins(&c, pin, 6);
+    sm_config_set_out_pins(&c, pin, 6);
+
+    sm_config_set_clkdiv(&c, clk/4.0); // 4 cycles/pixel , 114MHz/4: 28.5MHz pixel clock
+
+    for (int j = 0; j < 6; j++) {
+        pio_gpio_init(pio, pin+j);
+    }    
+
+    // pin direction: output
+    pio_sm_set_consecutive_pindirs(pio, sm, pin, 6, true);
+
+    pio_sm_init(pio, sm, offset, &c);
+
+    // pio_sm_set_enabled(pio, sm, true);
+}
+%}

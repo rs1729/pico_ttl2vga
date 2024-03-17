@@ -1,0 +1,56 @@
+
+.program getpix
+
+
+pull block                  ; FIFO to OSR: number of color pixels
+mov y, osr
+
+.wrap_target
+
+mov x, y                    ; Initialize counter variable
+
+wait 1 irq 4 [2]            ; Wait for hsync active mode
+
+pixel:
+    nop
+    in pins, 8 [1]
+    jmp x-- pixel
+
+.wrap
+
+
+
+% c-sdk {
+static inline void getpix_program_init(PIO pio, uint sm, uint offset, uint pin, uint16_t div_int, uint8_t div_frac) {
+
+    pio_sm_config c = getpix_program_get_default_config(offset);
+
+    sm_config_set_in_shift(&c, true, true, 32); // 4 x 6color+2sync
+
+    sm_config_set_in_pins(&c, pin);
+
+
+    // 14.318MHz  CGA/EGA  114/div=57.272=4*14.318 , div=1.99
+    //OAK:    sm_config_set_clkdiv_int_frac(&c, 2,  55); 
+    //ET3000: sm_config_set_clkdiv_int_frac(&c, 2,  72);
+
+    // 16.257MHz  MDA/EGA_Mode2  114/div=65.028=4*16.257 , div=1.753
+    //OAK:    sm_config_set_clkdiv_int_frac(&c, 1, 232); 
+    //ET3000: sm_config_set_clkdiv_int_frac(&c, 1, 240);
+
+    // 4 instructions / pixel
+    sm_config_set_clkdiv_int_frac(&c, div_int, div_frac); // div = div_int + div_frac/256
+
+
+    for (int j = 0; j < 8; j++) {
+        pio_gpio_init(pio, pin+j);
+    }    
+    
+    // pin direction: input
+    pio_sm_set_consecutive_pindirs(pio, sm, pin, 8, false); // 6+2
+
+    pio_sm_init(pio, sm, offset, &c);
+
+    // pio_sm_set_enabled(pio, sm, true);
+}
+%}
