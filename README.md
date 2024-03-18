@@ -5,7 +5,7 @@ PICO TTL2VGA
 
 Simple TTL (MDA/CGA/EGA) to VGA converter based on RPi Pico.<br />
 VGA output is 720x400 (-31.4kHz/+70Hz).<br />
-input video modes:<br />
+Input video modes:<br />
 | mode       | resolution | frequency / polarity | pixel clock | VSYNC    | total lines |
 |------------|------------|----------------------|-------------|----------|-------------|
 | MDA        | 720x350    | H:+18.4kHz  V:-50Hz  |  16.257MHz  | 16 lines |   369       |
@@ -13,7 +13,7 @@ input video modes:<br />
 | EGA Mode 1 | 640x200    | H:+15.7kHz  V:+60Hz  |  14.318MHz  |  3 lines |   262       |
 | EGA Mode 2 | 640x350    | H:+21.8kHz  V:-60Hz  |  16.257MHz  | 13 lines |   364       |
 
-Using the buttons, pixel clock (horizontal width) can be adjusted.
+Using the buttons, the pixel clock (horizontal width) can be adjusted.
 In MDA and CGA/EGA the pallete can be toggled.
 
 Tested only with OAK067 and ET3000 EGA/VGA graphics cards.
@@ -28,7 +28,7 @@ Tested only with OAK067 and ET3000 EGA/VGA graphics cards.
     DB9 male connector<br />
     DB15 female connector<br />
     3 buttons<br />
-    1nF capacitor
+    1nF capacitor (optional, if VSYNC is noisy)
 
 [Schematic](pico_ttl2vga.pdf)
 
@@ -49,4 +49,23 @@ Tested only with OAK067 and ET3000 EGA/VGA graphics cards.
 
   cf. https://vanhunteradams.com/Pico/VGA/VGA.html<br />
 
+#### Remarks
+
+1. Use at your own risk! Don't expect too much.
+
+2. The 114 MHz system clock reduces jitter in the VGA output.<br />
+   The input pixel clock will probably introduce jitter. The clock divider for the pixel clock can be adjusted (GP20/21). If USB output is enabled, the clock divider fractional part for the current video mode can be seen in a serial monitor. However, if `pico_enable_stdio_usb(ttl2vga 1)` is enabled, the frame buffer is limited to 720x350. If scanning starts too early, the last line would be missing. For normal use a frame buffer of 720x351 is recommended (see below). Once the best settings have been found, they can be set in `ttl_in.h`, e.g.
+   ```C
+   #define DIV16M_FRAC  207
+   #define DIVMDA_FRAC  232
+   #define DIV14M_FRAC  77
+   ```
+   If `pico_enable_stdio_usb(ttl2vga 0)` is disabled, `vga_out.h:YACTIVE` and `ttl_in.h:YLNS_MDA` should be set to 351 lines. This would take into account variations of various graphics cards. In EGA Mode 2 there should be 350 visible lines, 13 lines vertical sync, and 364 total lines, i.e. not much room for front/back porch.
+
+3. Use test images (e.g. CheckIt) to find the right pixel clocks.<br />
+   640x200 EGA:<br />
+   ![mode0Eh](640x200_mode0Eh.jpg)<br />
+   640x350 EGA Mode 2:<br />
+   ![mode10h](640x350_mode10h.jpg)<br />
+   (The distortion is due to the camera angle.)
 
