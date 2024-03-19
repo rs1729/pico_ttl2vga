@@ -60,7 +60,13 @@ Tested only with OAK067 and ET3000 EGA/VGA graphics cards.
    #define DIVMDA_FRAC  232
    #define DIV14M_FRAC  77
    ```
-   If `pico_enable_stdio_usb(ttl2vga 0)` is disabled, `vga_out.h:YACTIVE` and `ttl_in.h:YLNS_MDA` should be set to 351 lines. This would take into account variations of various graphics cards. In EGA Mode 2 there should be 350 visible lines, 13 lines vertical sync, and 364 total lines, i.e. not much room for front/back porch.
+   If `pico_enable_stdio_usb(ttl2vga 0)` is disabled, `vga_out.h:YACTIVE` and `ttl_in.h:YLNS_MDA` should be set to 351 lines. This would take into account variations of various graphics cards. In EGA Mode 2 there should be 350 visible lines, 13 lines vertical sync, and 364 total lines, i.e. not much room for front/back porch.<br />
+   640x350 EGA Mode 2:<br />
+   ![EGA2_640x350](EGA2_640x350.png)<br />
+   640x200 CGA/EGA:<br />
+   ![CGAEGA_640x200](CGAEGA_640x200.png)<br />
+   720x350 MDA:<br />
+   ![MDA_720x350](MDA_720x350.png)<br />
 
 3. Use test images (e.g. CheckIt) to find the right pixel clocks.<br />
    640x200 EGA:<br />
