@@ -7,7 +7,7 @@ mov y, osr                  ; Copy value from OSR to y scratch register
 
 .wrap_target
 
-set pins, 0                 ; Zero (consecutive) RGB pins in blanking
+set pins, 0                 ; Zero (consecutive) RGB pins in blanking ; set_count:0-5 ...
 mov x, y                    ; Initialize counter variable
 
 wait 1 irq 1 [6]            ; Wait for vsync active mode (starts 8 cycles after execution)
@@ -26,7 +26,7 @@ static inline void rgb_program_init(PIO pio, uint sm, uint offset, uint pin, flo
 
     pio_sm_config c = rgb_program_get_default_config(offset);
 
-    sm_config_set_set_pins(&c, pin, 6);
+    sm_config_set_set_pins(&c, pin, 6); // set_count:0-5; out additional black pixel or reduce scan width (via pixel clock)
     sm_config_set_out_pins(&c, pin, 6);
 
     sm_config_set_clkdiv(&c, clk/4.0); // 4 cycles/pixel , 114MHz/4: 28.5MHz pixel clock
