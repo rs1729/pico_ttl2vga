@@ -26,7 +26,7 @@
 //400 -> 350 visible
 
 #define VGALINE (XACTIVE)
-#define VGALNBF (VGALINE+1)
+#define VGALNBF (VGALINE+4)  // arm 4 byte alignment (USB: YACTIVE=YLNS_MDA=349)
 
 // VGA timing constants
 #define H_ACTIVE   (XACTIVE+X_FP-2 -1)  // one cycle delay for mov, one for set
