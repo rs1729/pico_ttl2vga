@@ -80,7 +80,9 @@ void scan_in(int pal) {
             while (pio_sm_is_rx_fifo_empty(_PIO, _SM)) tight_loop_contents();
             uint32_t col4 = _PIO->rxf[_SM] & 0x3F3F3F3F;
             if (pal == PAL_MDA) col4 = (col4 & MASK_GREEN2INT) | ((col4 & MASK_BLUE2MONO)>>1);
-            *((uint32_t*)(vga_data_array+(VGALNBF*y + x))) = col4;
+            //(a) VGALNBF==VGALINE: if (x == VGALINE-4) col4 &= 0x1F3F3F3F; // MDA pixel 720, bit 6
+            //(b) VGALNBF==VGALINE+4:
+            *((uint32_t*)(vga_data_array+(VGALNBF*y + x))) = col4;  // 4 byte aligned ?
         }
     }
 
@@ -270,7 +272,7 @@ int main() {
         vmode == CGAEGA ? (pal == PAL_CGA ? scan2cga_in() : scan2_in()) : scan_in(pal);  // 50-60 Hz
 
         cnt += 1;
-        if (1 && cnt == 10) {  // 5-6 Hz
+        if (cnt == 10) {  // 5-6 Hz
 
             // VSYNC freq timer
             //
