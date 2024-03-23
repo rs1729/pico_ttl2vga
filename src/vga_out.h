@@ -25,12 +25,13 @@
 #define Y_BP     60 //-25=35
 //400 -> 350 visible
 
+#define VGALINE (XACTIVE)
+#define VGALNBF (VGALINE+1)
+
 // VGA timing constants
 #define H_ACTIVE   (XACTIVE+X_FP-2 -1)  // one cycle delay for mov, one for set
 #define V_ACTIVE   (YACTIVE -1)
-#define RGB_ACTIVE (XACTIVE -1)         // 1 pix/byte
-
-#define VGALINE (XACTIVE)
+#define RGB_ACTIVE (VGALNBF -1)         // 1 pix/byte
 
 
 #define CLKkHZ 114000  // default: 125000  // 114/4=28.5
@@ -40,7 +41,8 @@
 // Length of the pixel array, and number of DMA transfers
 // 640x400=256000
 // 720x350=252000
-#define FRMBUFSZ (VGALINE*YACTIVE)
+// 721x351=253071
+#define FRMBUFSZ (VGALNBF*YACTIVE)
 
 unsigned char vga_data_array[FRMBUFSZ+4];
 

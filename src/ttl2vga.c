@@ -80,7 +80,7 @@ void scan_in(int pal) {
             while (pio_sm_is_rx_fifo_empty(_PIO, _SM)) tight_loop_contents();
             uint32_t col4 = _PIO->rxf[_SM] & 0x3F3F3F3F;
             if (pal == PAL_MDA) col4 = (col4 & MASK_GREEN2INT) | ((col4 & MASK_BLUE2MONO)>>1);
-            *((uint32_t*)(vga_data_array+(VGALINE*y + x))) = col4;
+            *((uint32_t*)(vga_data_array+(VGALNBF*y + x))) = col4;
         }
     }
 
@@ -123,10 +123,10 @@ void scan2_in(/*int pal*/) {
                 if ( col4 & 0x04000000 ) col4 |= 0x15000000;
             }
             */
-            *((uint32_t*)(vga_data_array+(VGALINE*n + x))) = col4;
+            *((uint32_t*)(vga_data_array+(VGALNBF*n + x))) = col4;
         }
         if (y & 1) {  // duplicate every second line
-            memcpy(vga_data_array+VGALINE*(n+1), vga_data_array+VGALINE*n, xscanlrd);
+            memcpy(vga_data_array+VGALNBF*(n+1), vga_data_array+VGALNBF*n, xscanlrd);
             n++;
         }
     }
@@ -168,10 +168,10 @@ void scan2cga_in(/*int pal*/) {
                 if ( col4 & 0x00040000 ) col4 |= 0x00110000;
                 if ( col4 & 0x04000000 ) col4 |= 0x11000000;
             }
-            *((uint32_t*)(vga_data_array+(VGALINE*n + x))) = col4;
+            *((uint32_t*)(vga_data_array+(VGALNBF*n + x))) = col4;
         }
         if (y & 1) {  // duplicate every second line
-            memcpy(vga_data_array+VGALINE*(n+1), vga_data_array+VGALINE*n, xscanlrd);
+            memcpy(vga_data_array+VGALNBF*(n+1), vga_data_array+VGALNBF*n, xscanlrd);
             n++;
         }
     }
