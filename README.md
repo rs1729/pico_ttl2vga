@@ -54,7 +54,7 @@ Tested only with OAK067 and ET3000 EGA/VGA graphics cards.
 1. Use at your own risk! Don't expect too much.
 
 2. The 114 MHz system clock reduces jitter in the VGA output.<br />
-   The input pixel clock will probably introduce jitter. The clock divider for the pixel clock can be adjusted (GP20/21). If USB output is enabled, the clock divider fractional part for the current video mode can be seen in a serial monitor. However, if `pico_enable_stdio_usb(ttl2vga 1)` is enabled, the frame buffer is limited to 720x350. If scanning starts too early, the last line would be missing. For normal use a frame buffer of 720x351 is recommended (see below). Once the best settings have been found, they can be set in `ttl_in.h`, e.g.
+   The input pixel clock will probably introduce jitter. The clock divider for the pixel clock can be adjusted (GP20/21). If USB output is enabled, the clock divider fractional part for the current video mode can be seen in a serial monitor. However, if `pico_enable_stdio_usb(ttl2vga 1)` is enabled, the frame buffer is limited to 720x350 (or 724x349). If scanning starts too early, the last line would be missing. For normal use a frame buffer of 720x351 (or 724x351) is recommended (see below). Once the best settings have been found, they can be set in `ttl_in.h`, e.g.
    ```C
    #define DIV16M_FRAC  207
    #define DIVMDA_FRAC  232

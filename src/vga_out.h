@@ -42,6 +42,7 @@
 // 640x400=256000
 // 720x350=252000
 // 721x351=253071
+// 724x351=254124
 #define FRMBUFSZ (VGALNBF*YACTIVE)
 
 unsigned char vga_data_array[FRMBUFSZ+4];
