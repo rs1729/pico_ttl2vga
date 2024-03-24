@@ -23,7 +23,7 @@
 
 
 // DBG_USB 0: set  vga_out.h:YACTIVE=351 , YLNS_MDA=351 , CMakeLists.txt:pico_enable_stdio_usb(ttl2vga 0)
-// DBG_USB 1: set  vga_out.h:YACTIVE=350 , YLNS_MDA=350 , CMakeLists.txt:pico_enable_stdio_usb(ttl2vga 1)
+// DBG_USB 1: set  vga_out.h:YACTIVE=349 , YLNS_MDA=349 , CMakeLists.txt:pico_enable_stdio_usb(ttl2vga 1)
 #define DBG_USB 0  // interference
 #define DBG_PIN 0
 
@@ -32,17 +32,18 @@
 
 
 #if DBG_PIN
-const uint TP_FRMBUF_IN = 18; // GP18=pin24
+const uint TP_FRMBUF_IN = 22; // GP22 = pin29
 #endif
 
 
 #if TOGGLEPAL
-const uint BUTTON_PAL = 19; // GP19 = pin25
+const uint BUTTON_PAL = 21; // GP21 = pin27
 #endif
 
 #if ADJ_CLK
-const uint BUTTON_PLS = 20; // GP20 = pin26
-const uint BUTTON_MIN = 21; // GP21 = pin27
+const uint BUTTON_MIN = 20; // GP20 = pin26
+const uint BUTTON_PLS = 19; // GP19 = pin25
+const uint BUTTON_OSD = 18; // GP18 = pin24
 #endif
 
 
@@ -218,6 +219,8 @@ int main() {
     uint8_t pol_VSYNC = 0;  // 1:V+ , 0:V-
     uint8_t cnt = 0;
 
+    char txtbuf[32] = { 0 };
+
 
     stdio_init_all();
 
@@ -242,6 +245,10 @@ int main() {
     gpio_init(BUTTON_MIN);
     gpio_set_dir(BUTTON_MIN, GPIO_IN);
     gpio_pull_up(BUTTON_MIN);    // connect PIN - BUTTON - GND
+
+    gpio_init(BUTTON_OSD);
+    gpio_set_dir(BUTTON_OSD, GPIO_IN);
+    gpio_pull_up(BUTTON_OSD);    // connect PIN - BUTTON - GND
     #endif
 
     gpio_init(VSYNC_IN);
@@ -352,6 +359,23 @@ int main() {
 
             t0 = t1;
             cnt = 0;
+
+
+            if (gpio_get(BUTTON_OSD) == 0) {
+                sprintf(txtbuf, "Mode: %s", modestr[vmode]);
+                wrtxt(20, 20, txtbuf, 0x3F);
+                sprintf(txtbuf,  "hpix = %3d", hpix);
+                wrtxt(20, 30, txtbuf, 0x3F);
+                sprintf(txtbuf, "divfrac = %d", divfrac);
+                wrtxt(20, 40, txtbuf, 0x3F);
+                if (dt > 0) {
+                    float fq = 1e7/dt;
+                    sprintf(txtbuf, "V = %+.2fHz", pol_VSYNC>0 ? fq : -fq);
+                    wrtxt(20, 50, txtbuf, 0x3F);
+                }
+                sleep_ms(4000);
+            }
+
 
             #if DBG_USB
             // enable usb output (only if frame_buffer 720x350)

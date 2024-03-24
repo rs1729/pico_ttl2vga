@@ -59,6 +59,13 @@ enum col_pals {PAL_EGA=0, PAL_CGA, PAL_MDA};
 //enum vidmodes {UNKNOWN=0, MDA, CGA, EGA, EGA2};
 enum vidmodes {UNKNOWN=0, MDA, CGAEGA, EGA2};
 
+static char *modestr[] = {
+    [UNKNOWN] = "unknown",
+    [MDA]     = "MDA",
+    [CGAEGA]  = "CGA/EGA",
+    [EGA2]    = "EGA2"
+};
+
 
 // init in ttlIn_Init()
 uint32_t prelines;

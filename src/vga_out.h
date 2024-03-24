@@ -52,5 +52,7 @@ unsigned char vga_data_array[FRMBUFSZ+4];
 enum vga_pins {HSYNC=0, VSYNC, RED_PIN2, RED_PIN1, GREEN_PIN2, GREEN_PIN1, BLUE_PIN2, BLUE_PIN1};
 
 
-void initVGA(void) ;
+void initVGA(void);
+
+void wrtxt(int, int, char*, char);
 

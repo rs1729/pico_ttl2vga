@@ -14,6 +14,8 @@
 #include "rgb_out.pio.h"
 
 #include "vga_out.h"
+#include "font5x7.h"
+
 
 char *address_pointer = vga_data_array; //= &vga_data_array[0];
 
@@ -86,4 +88,62 @@ void initVGA() {
     dma_start_channel_mask((1u << rgb_chan_0)) ;
 }
 
+
+#define _width  XACTIVE //720
+#define _height YACTIVE //351
+
+#define pgm_read_byte(addr) (*(const unsigned char *)(addr))
+
+int cursor_y, cursor_x;
+char textcolor, textbgcolor;
+
+void drawPixel(int x, int y, char color) {
+    if (x < 0 || x >= _width) return;
+    if (y < 0 || y >= _height) return;
+
+    //color &= 0x3F; // 6 bit
+
+    vga_data_array[VGALNBF*y + x] = color;
+    //vga_data_array[VGALNBF*y + x] ^= color;
+}
+
+void drawChar(int x, int y, unsigned char c, char color, char bg) {
+    int i, j;
+
+    if ( x < 0 || x >= _width ||
+         y < 0 || y >= _height ) return;
+
+    for (i=0; i<6; i++) {
+        unsigned char line;
+        if (i == 5) line = 0x0;
+        else        line = pgm_read_byte(font+(c*5)+i);
+        for (j=0; j<8; j++) {
+            if (line & 0x1) {
+                drawPixel(x+i, y+j, color);
+            }
+            else if (bg != color) {
+                drawPixel(x+i, y+j, bg);
+            }
+            line >>= 1;
+        }
+    }
+}
+
+void tft_write(unsigned char c) {
+    drawChar(cursor_x, cursor_y, c, textcolor, textbgcolor);
+    cursor_x += 6;
+    if (cursor_x > _width-6) {
+      cursor_y += 8;
+      cursor_x = 0;
+    }
+}
+
+inline void wrtxt(int x, int y, char *str, char color) {
+    textcolor = color;
+    cursor_x = x;
+    cursor_y = y;
+    while (*str) {
+        tft_write(*str++);
+    }
+}
 
