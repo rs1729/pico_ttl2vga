@@ -27,7 +27,7 @@ Tested only with OAK067 and ET3000 EGA/VGA graphics cards.
     2 $\times$ 100 &Omega; resistors<br />
     DB9 male connector<br />
     DB15 female connector<br />
-    3 buttons<br />
+    4 buttons<br />
     1nF capacitor (optional, if VSYNC is noisy)
 
 [Schematic](pico_ttl2vga.pdf)
