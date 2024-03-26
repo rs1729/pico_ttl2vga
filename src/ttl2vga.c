@@ -360,7 +360,7 @@ int main() {
             t0 = t1;
             cnt = 0;
 
-
+            #if ADJ_CLK
             if (gpio_get(BUTTON_OSD) == 0) {
                 sprintf(txtbuf, "Mode: %s", modestr[vmode]);
                 wrtxt(20, 20, txtbuf, 0x3F);
@@ -375,7 +375,7 @@ int main() {
                 }
                 sleep_ms(4000);
             }
-
+            #endif
 
             #if DBG_USB
             // enable usb output (only if frame_buffer 720x350)
