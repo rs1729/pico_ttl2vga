@@ -185,9 +185,7 @@ void scan2cga_in(/*int pal*/) {
 }
 
 void reset_TTLin() {
-    pio_sm_set_enabled(_PIO, 0, false);
-    pio_sm_set_enabled(_PIO, 1, false);
-    pio_sm_set_enabled(_PIO, 2, false);
+    pio_set_sm_mask_enabled(_PIO, (1u << 0) | (1u << 1) | (1u << 2), false);
     pio_clear_instruction_memory(_PIO);
 }
 
