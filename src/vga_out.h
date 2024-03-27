@@ -26,7 +26,10 @@
 //400 -> 350 visible
 
 #define VGALINE (XACTIVE)
-#define VGALNBF (VGALINE+4)  // arm 4 byte alignment (USB: YACTIVE=YLNS_MDA=349)
+// (a) additional blanking pixel
+//#define VGALNBF (VGALINE+4)  // arm 4 byte alignment (USB: YACTIVE=YLNS_MDA=349)
+// (b) set pin0..4 and sideset pin5   (+1 pio instruction, limited to 6 bit)
+#define VGALNBF (VGALINE)
 
 // VGA timing constants
 #define H_ACTIVE   (XACTIVE+X_FP-2 -1)  // one cycle delay for mov, one for set
