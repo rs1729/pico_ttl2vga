@@ -39,7 +39,7 @@ static inline void hsync_in_14M_program_init(PIO pio, uint sm, uint offset, uint
     sm_config_set_clkdiv_int_frac(&c, div_int, div_frac);
 
     pio_gpio_init(pio, pin);
-    gpio_pull_up(pin);
+    gpio_pull_down(pin);
 
     // pin direction: input
     pio_sm_set_consecutive_pindirs(pio, sm, pin, 1, false);

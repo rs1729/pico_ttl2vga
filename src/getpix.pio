@@ -42,8 +42,9 @@ static inline void getpix_program_init(PIO pio, uint sm, uint offset, uint pin, 
     sm_config_set_clkdiv_int_frac(&c, div_int, div_frac); // div = div_int + div_frac/256
 
 
-    for (int j = 0; j < 8; j++) {
+    for (int j = 0; j < 8; j++) {  // overlap HSYNC_IN, VSYNC_IN
         pio_gpio_init(pio, pin+j);
+        gpio_pull_down(pin+j);
     }    
     
     // pin direction: input

@@ -27,7 +27,7 @@ static inline void vsync_in_14M_program_init(PIO pio, uint sm, uint offset, uint
     sm_config_set_clkdiv(&c, 4);
 
     pio_gpio_init(pio, pin);
-    gpio_pull_up(pin);
+    gpio_pull_down(pin);
 
     // pin direction: input
     pio_sm_set_consecutive_pindirs(pio, sm, pin, 1, false);
