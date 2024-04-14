@@ -41,8 +41,8 @@ const uint BUTTON_PAL = 21; // GP21 = pin27
 #endif
 
 #if ADJ_CLK
-const uint BUTTON_MIN = 20; // GP20 = pin26
-const uint BUTTON_PLS = 19; // GP19 = pin25
+const uint BUTTON_PLS = 20; // GP20 = pin26
+const uint BUTTON_MIN = 19; // GP19 = pin25
 const uint BUTTON_OSD = 18; // GP18 = pin24
 #endif
 
@@ -372,6 +372,8 @@ int main() {
                     wrtxt(20, 50, txtbuf, 0x3F);
                 }
                 sleep_ms(4000);
+                //
+                memset(vga_data_array, 0, FRMBUFSZ);
             }
             #endif
 
