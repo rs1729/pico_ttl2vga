@@ -79,3 +79,7 @@ Tested only with OAK067 and ET3000 EGA/VGA graphics cards.
 
 5. If USB output is enabled, the clock divider fractional part for the current video mode can be seen in a serial monitor. However, if `pico_enable_stdio_usb(ttl2vga 1)` is enabled, the frame buffer is limited to 720x350 (or 724x349).
    If `pico_enable_stdio_usb(ttl2vga 0)` is disabled, `vga_out.h:YACTIVE` and `ttl_in.h:YLNS_MDA` should be set to 351 lines. This would take into account variations between different graphics cards.
+
+6. Hercules Monochrome Graphics:<br />
+   ![HGC](hgc2vga.jpg)<br />
+

@@ -5,9 +5,10 @@
     IN : GP8..GP15     (ttl_in.h)
     OUT: GP0..GP7      (vga_out.h)
 
-    DBG: GP18      -  signal reading pixel into frame buffer
-    PAL: GP19      -  toggle palette: (a) CGA <-> EGA , (b) MDA mono/intensity <-> dark/light green
-    CLK: GP20..21  -  adjust pixel clock / horizontal width
+    OSD: GP18      -  show video mode on screen
+    CLK: GP19..20  -  adjust pixel clock / horizontal width
+    PAL: GP21      -  toggle palette: (a) CGA <-> EGA , (b) MDA mono/intensity <-> dark/light green
+    DBG: GP22      -  signal reading pixel into frame buffer
 */
 
 
@@ -22,8 +23,8 @@
 #include "ttl_in.h"
 
 
-// DBG_USB 0: set  vga_out.h:YACTIVE=351 , YLNS_MDA=351 , CMakeLists.txt:pico_enable_stdio_usb(ttl2vga 0)
-// DBG_USB 1: set  vga_out.h:YACTIVE=349 , YLNS_MDA=349 , CMakeLists.txt:pico_enable_stdio_usb(ttl2vga 1)
+// DBG_USB 0: set  vga_out.h:YACTIVE=351 , tth_in.h:YLNS_MDA=351 , CMakeLists.txt:pico_enable_stdio_usb(ttl2vga 0)
+// DBG_USB 1: set  vga_out.h:YACTIVE=349 , ttl_in.h:YLNS_MDA=349 , CMakeLists.txt:pico_enable_stdio_usb(ttl2vga 1)
 #define DBG_USB 0  // interference
 #define DBG_PIN 0
 
@@ -287,8 +288,9 @@ int main() {
             else dt = 0;
             // V=50Hz: 1e6 * 10/50 = 200000
             // V=60Hz: 1e6 * 10/60 = 166666
+            // > 10Hz after OSD:
             if (dt > 190000 && dt < 227272) hpix = LINE_MDA; // 44Hz..52Hz (+1 cnt)
-            else                            hpix = LINE_EGA; // 54Hz..60Hz (+1 cnt)
+            else if (dt < 1000000 )         hpix = LINE_EGA; // 54Hz..60Hz (+1 cnt)
 
             // read VSYNC polarity
             //
