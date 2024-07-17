@@ -68,9 +68,10 @@ static char *modestr[] = {
 
 
 // init in ttlIn_Init()
-uint32_t prelines;
-uint32_t ylinesrd;
-uint32_t xscanlrd;
+#ifdef NO_COMMON
+extern
+#endif
+uint32_t prelines, ylinesrd, xscanlrd;
 
 void ttlIn_Init_16MHz(uint16_t, uint8_t, int);
 void ttlIn_Init_14MHz(uint16_t, uint8_t);

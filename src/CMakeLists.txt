@@ -1,6 +1,11 @@
 # cmake version
 cmake_minimum_required(VERSION 3.13)
 
+## gcc 10 default: -fno-common
+add_compile_options(-fcommon)
+## or
+#add_compile_options(-DNO_COMMON)
+
 # include the sdk.cmake file
 include(pico_sdk_import.cmake)
 

@@ -57,6 +57,10 @@ const uint BUTTON_OSD = 18; // GP18 = pin24
 #define MASK_GREEN2INT 0x04040404
 #define MASK_BLUE2MONO 0x10101010
 
+#ifdef NO_COMMON
+uint32_t prelines, ylinesrd, xscanlrd;
+#endif
+
 void scan_in(int pal) {
 
     while ( !(_PIO->irq & (1<<6)) ) _PIO->rxf[_SM];  // sync with vsync_in, empty FIFO

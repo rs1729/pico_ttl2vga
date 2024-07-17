@@ -48,6 +48,9 @@
 // 724x351=254124
 #define FRMBUFSZ (VGALNBF*YACTIVE)
 
+#ifdef NO_COMMON
+extern
+#endif
 unsigned char vga_data_array[FRMBUFSZ+4];
 
 

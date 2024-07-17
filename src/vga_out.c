@@ -16,6 +16,9 @@
 #include "vga_out.h"
 #include "font5x7.h"
 
+#ifdef NO_COMMON
+unsigned char vga_data_array[FRMBUFSZ+4];
+#endif
 
 char *address_pointer = vga_data_array; //= &vga_data_array[0];
 
