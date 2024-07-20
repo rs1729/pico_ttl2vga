@@ -264,7 +264,7 @@ int main() {
     uint vco_freq = 1596000000;
     uint post_div1 = 7;
     uint post_div2 = 2;
-    set_sys_clock_pll (vco_freq, post_div1, post_div2);
+    set_sys_clock_pll(vco_freq, post_div1, post_div2);
     
 
     ttlIn_Init_16MHz(DIV16M_INT, DIV16M_FRAC, LINE_EGA);
@@ -340,8 +340,20 @@ int main() {
 
                 reset_TTLin(_PIO);
 
-                pol_VSYNC > 0 ? ttlIn_Init_14MHz(DIV14M_INT, divfrac)
-                              : ttlIn_Init_16MHz(DIV16M_INT, divfrac, vmode);
+                // pol_VSYNC > 0 ? ttlIn_Init_14MHz(DIV14M_INT, divfrac)
+                //               : ttlIn_Init_16MHz(DIV16M_INT, divfrac, vmode);
+                switch (vmode)
+                {
+                    case CGAEGA:
+                                ttlIn_Init_14MHz(DIV14M_INT, divfrac);
+                                break;
+                    case EGA2:  // MDA720
+                                ttlIn_Init_16MHz(DIV16M_INT, divfrac, vmode);
+                                break;
+                    case MDA:   // if MDA640, this is 14MHz, but same EGA2 polarity
+                                ttlIn_Init_16MHz(DIVMDA_INT, divfrac, vmode);
+                                break;
+                }
 
                 memset(vga_data_array, 0, FRMBUFSZ);
                 // pixel clock 14MHz:

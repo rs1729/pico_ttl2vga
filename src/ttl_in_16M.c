@@ -12,11 +12,12 @@
 
 // MDA  720x350
 // EGA2 640x350
+// MDA640: 720 -> 640 (16MHz -> 14MHz)
 void ttlIn_Init_16MHz(uint16_t div_int, uint8_t div_frac, int vm) {
 
     if (vm == MDA) {
         prelines = PRELINES_MDA;
-        xscanlrd = LINE_MDA; // 720
+        xscanlrd = LINE_SCAN_MDA; // 720 or 720*8/9=640
     }
     else {
         prelines = PRELINES_16M;

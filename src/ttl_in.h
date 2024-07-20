@@ -24,6 +24,16 @@
     EGA (Mode 2)  640x350   H+:21.8kHz  V-:60Hz  px_clk:16.257MHz   vsync: 13 lines    total: 364 lines
 */
 
+/*
+    720:640 = 9:8
+    MDA640 = MDA*8/9 = 640 ,  px_clk: 16.257MHz*8/9 = 14.45MHz
+    if VGA monitor displays only 640 pix in 720x400 mode, scan at 8/9 speed:
+    -> define MDA_SCAN640
+*/
+
+//#define MDA_SCAN640  1
+
+
 #define LINE_MDA  720
 #define LINE_CGA  640
 #define LINE_EGA  640
@@ -42,12 +52,23 @@
 // DIV = DIV_INT + DIV_FRAC/256
 //V-
 #define DIV16M_INT   1
-#define DIV16M_FRAC  207  // 207..232..240   // OAK:207(EGA2),232(MDA)(207:GREEN/BLUE)  ET4000:222-223
-#define DIVMDA_FRAC  232  // 207..232..240   // OAK:207(EGA2),232(MDA)(207:GREEN/BLUE)  ET4000:240
+#define DIV16M_FRAC  207  // 207..232..240   // OAK:207(EGA2),232(MDA)(207:GREEN/BLUE)  ET3000:222-223
+#define DIVMDA720_FRAC  232  // DIV16M_INT   // OAK:207(EGA2),232(MDA)(207:GREEN/BLUE)  ET3000:240
+#define DIVMDA640_FRAC  77   // DIV14M_INT
 //V+
 #define DIV14M_INT   2
-#define DIV14M_FRAC  77   // 51..122         // OAK:51..55..77  ET4000:122
+#define DIV14M_FRAC  77   // 51..122         // OAK:51..55..77  ET3000:122
 //H-CLK=2: OAK=72
+
+#ifdef MDA_SCAN640
+    #define LINE_SCAN_MDA  640
+    #define DIVMDA_INT     DIV14M_INT
+    #define DIVMDA_FRAC    DIVMDA640_FRAC
+#else  // default
+    #define LINE_SCAN_MDA  720
+    #define DIVMDA_INT     DIV16M_INT
+    #define DIVMDA_FRAC    DIVMDA720_FRAC
+#endif
 
 
 //enum ega_pins {HSYNC_IN=8, VSYNC_IN, RED2_IN, RED1_IN, GREEN2_IN, GREEN1_IN, BLUE2_IN, BLUE1_IN, GND1, GND2};
