@@ -58,10 +58,11 @@ Tested only with OAK067 and ET3000 EGA/VGA graphics cards.
 
 3. If scanning starts too early, the last line would be missing. For normal use, a frame buffer of 720x351 (or 724x351) is recommended (see below). Once the best settings have been found, they can be set in `ttl_in.h`, e.g.
    ```C
-   #define DIV16M_FRAC  207  // EGA2
-   #define DIVMDA_FRAC  232  // MDA
-   #define DIV14M_FRAC   77  // CGA/EGA
+   ttlmode_t mode_MDA    { .div_int  = 1, .div_frac = 232 }
+   ttlmode_t mode_EGA2   { .div_int  = 1, .div_frac = 207 }
+   ttlmode_t mode_CGAEGA { .div_int  = 2, .div_frac =  77 }
    ```
+   (can be adjusted using `BUTTON_PLS`/`BUTTON_MIN`)<br />
    In EGA Mode 2 there should be 350 visible lines, 13 lines vertical sync, and 364 total lines, i.e. not much room for front/back porch.<br />
    640x350 EGA Mode 2:<br />
    ![EGA2_640x350](EGA2_640x350.png)<br />
@@ -82,4 +83,14 @@ Tested only with OAK067 and ET3000 EGA/VGA graphics cards.
 
 6. Hercules Monochrome Graphics:<br />
    ![HGC](hgc2vga.jpg)<br />
+
+7. VGA 720x400@70Hz (-31.4kHz/+70Hz):<br />
+   Some monitors might output 640x400, thus MDA scan pixel clock of 16Mhz can be reduced to 8/9*16Mhz=14MHz using `BUTTON_PAL` or by setting
+   ```C
+   ttlmode_t mode_MDA { .xscanlrd = 720 }
+   ```
+   to
+   ```C
+   ttlmode_t mode_MDA { .xscanlrd = 640 }
+   ```
 

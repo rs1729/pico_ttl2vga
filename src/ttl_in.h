@@ -28,48 +28,48 @@
     720:640 = 9:8
     MDA640 = MDA*8/9 = 640 ,  px_clk: 16.257MHz*8/9 = 14.45MHz
     if VGA monitor displays only 640 pix in 720x400 mode, scan at 8/9 speed:
-    -> define MDA_SCAN640
+    -> toggle PAL or set mode_MDA.xscanlrd=640
 */
-
-//#define MDA_SCAN640  1
 
 
 #define LINE_MDA  720
 #define LINE_CGA  640
 #define LINE_EGA  640
 
-#define YLNS_MDA  351  // 350..351 <= VGA_YACTIVE , DBG_USB: 350
-#define YLNS_CGA  208  // 200 + 8  // addition buffer, CGA/EGA FP/BP variations
-#define YLNS_EGA  YLNS_CGA
-#define YLNS_EGA2 YLNS_MDA
+// #define YLNS_MDA  351  // 350..351 <= VGA_YACTIVE , DBG_USB: 350
+// #define YLNS_CGA  208  // 200 + 8  // addition buffer, CGA/EGA FP/BP variations
+// #define YLNS_EGA  YLNS_CGA
+// #define YLNS_EGA2 YLNS_MDA
 
-// VSYNC BP before pix
-#define PRELINES_MDA 1
-#define PRELINES_16M 1   // OAK:2  ET3000:1  (350+2 YLNS)
-#define PRELINES_14M 30  // 33..35 , EGA: 33 , CGA: 35 , ET3000: CGA=32, EGA=33
+// //VSYNC BP before pix
+// #define PRELINES_MDA 1
+// #define PRELINES_16M 1   // OAK:2  ET3000:1  (350+2 YLNS)
+// #define PRELINES_14M 30  // 33..35 , EGA: 33 , CGA: 35 , ET3000: CGA=32, EGA=33
 
 
+typedef struct {
+    int vmode;
+    uint16_t hline_px;
+    uint16_t vline_px;
+    uint16_t div_int;
+    int16_t  div_frac;
+    uint16_t prelines;
+    uint16_t xscanlrd;
+    uint16_t ylinesrd;
+    int pal;
+} ttlmode_t;
+
+/*
 // DIV = DIV_INT + DIV_FRAC/256
 //V-
-#define DIV16M_INT   1
-#define DIV16M_FRAC  207  // 207..232..240   // OAK:207(EGA2),232(MDA)(207:GREEN/BLUE)  ET3000:222-223
-#define DIVMDA720_FRAC  232  // DIV16M_INT   // OAK:207(EGA2),232(MDA)(207:GREEN/BLUE)  ET3000:240
-#define DIVMDA640_FRAC  77   // DIV14M_INT
+// DIV:(1,207)  // (1,207..232..240)
+// OAK:EGA2=(1,207), MDA=(1,232) ((1,207) GREEN/BLUE)
+// ET3000:(1,222-223..240)
 //V+
-#define DIV14M_INT   2
-#define DIV14M_FRAC  77   // 51..122         // OAK:51..55..77  ET3000:122
-//H-CLK=2: OAK=72
-
-#ifdef MDA_SCAN640
-    #define LINE_SCAN_MDA  640
-    #define DIVMDA_INT     DIV14M_INT
-    #define DIVMDA_FRAC    DIVMDA640_FRAC
-#else  // default
-    #define LINE_SCAN_MDA  720
-    #define DIVMDA_INT     DIV16M_INT
-    #define DIVMDA_FRAC    DIVMDA720_FRAC
-#endif
-
+// DIV:(2,77)   // (2,51..122)
+// OAK:(2,51..55..77)
+// ET3000:(2,122)
+*/
 
 //enum ega_pins {HSYNC_IN=8, VSYNC_IN, RED2_IN, RED1_IN, GREEN2_IN, GREEN1_IN, BLUE2_IN, BLUE1_IN, GND1, GND2};
 // read 8 pins into 8bits=1byte
@@ -88,14 +88,73 @@ static char *modestr[] = {
 };
 
 
-// init in ttlIn_Init()
-#ifdef NO_COMMON
-extern
-#endif
-uint32_t prelines, ylinesrd, xscanlrd;
+static ttlmode_t mode_MDA = {
+    .vmode    = MDA,
+    .hline_px = 720,
+    .div_int  = 1,
+    .div_frac = 232,
+    .prelines = 1,
+    .xscanlrd = 720,  // default:720 , compressed:640
+    .ylinesrd = 351,
+    .pal      = 0
+};
 
-void ttlIn_Init_16MHz(uint16_t, uint8_t, int);
-void ttlIn_Init_14MHz(uint16_t, uint8_t);
+static ttlmode_t mode_CGAEGA = {
+    .vmode    = CGAEGA,
+    .hline_px = 640,
+    .div_int  = 2,
+    .div_frac = 77,
+    .prelines = 30,
+    .xscanlrd = 640,
+    .ylinesrd = 208,
+    .pal      = 0
+};
+
+static ttlmode_t mode_EGA2 = {
+    .vmode    = EGA2,
+    .hline_px = 640,
+    .div_int  = 1,
+    .div_frac = 207,
+    .prelines = 1,
+    .xscanlrd = 640,
+    .ylinesrd = 351,
+    .pal      = 0
+};
+
+/*
+static ttlmode_t mode_MDA640 = {
+    .vmode    = MDA,
+    .hline_px = 720,
+    .div_int  = 2,
+    .div_frac = 77,
+    .prelines = 1,
+    .xscanlrd = 640,
+    .ylinesrd = 351
+};
+
+static ttlmode_t _mode_CGA = {
+    .vmode    = CGAEGA,
+    .hline_px = 640,
+    .div_int  = 2,
+    .div_frac = 77,
+    .prelines = 30,
+    .xscanlrd = 640,
+    .ylinesrd = 208
+};
+static ttlmode_t _mode_EGA = {
+    .vmode    = CGAEGA,
+    .hline_px = 640,
+    .div_int  = 2,
+    .div_frac = 77,
+    .prelines = 30,
+    .xscanlrd = 640,
+    .ylinesrd = 208
+};
+*/
+
+
+void ttlIn_Init_Vminus(ttlmode_t*);
+void ttlIn_Init_Vplus(ttlmode_t*);
 
 #endif // TTL_IN_H
 

@@ -57,9 +57,9 @@ const uint BUTTON_OSD = 18; // GP18 = pin24
 #define MASK_GREEN2INT 0x04040404
 #define MASK_BLUE2MONO 0x10101010
 
-#ifdef NO_COMMON
-uint32_t prelines, ylinesrd, xscanlrd;
-#endif
+
+ttlmode_t *ttlmode = &mode_EGA2;
+
 
 void scan_in(int pal) {
 
@@ -69,8 +69,8 @@ void scan_in(int pal) {
     gpio_put(TP_FRMBUF_IN, 1);
     #endif
 
-    for (uint y = 0; y < prelines; y++) {
-        for (uint x = 0; x < xscanlrd; x+=4) {
+    for (uint y = 0; y < ttlmode->prelines; y++) {
+        for (uint x = 0; x < ttlmode->xscanlrd; x+=4) {
             while (pio_sm_is_rx_fifo_empty(_PIO, _SM)) tight_loop_contents();
             _PIO->rxf[_SM];
         }
@@ -81,11 +81,12 @@ void scan_in(int pal) {
     gpio_put(TP_FRMBUF_IN, 1);
     #endif
 
-    for (uint y = 0; y < ylinesrd; y++) {
-        for (uint x = 0; x < xscanlrd; x+=4) {
+    for (uint y = 0; y < ttlmode->ylinesrd; y++) {
+        for (uint x = 0; x < ttlmode->xscanlrd; x+=4) {
             while (pio_sm_is_rx_fifo_empty(_PIO, _SM)) tight_loop_contents();
             uint32_t col4 = _PIO->rxf[_SM] & 0x3F3F3F3F;
-            if (pal == PAL_MDA) col4 = (col4 & MASK_GREEN2INT) | ((col4 & MASK_BLUE2MONO)>>1);
+            // pal := (ttlmode->vmode == MDA && (ttlmode->pal & 0x1))
+            if (pal) col4 = (col4 & MASK_GREEN2INT) | ((col4 & MASK_BLUE2MONO)>>1);
             //(a) VGALNBF==VGALINE: if (x == VGALINE-4) col4 &= 0x1F3F3F3F; // MDA pixel 720, bit 6
             //(b) VGALNBF==VGALINE+4:
             *((uint32_t*)(vga_data_array+(VGALNBF*y + x))) = col4;  // 4 byte aligned ?
@@ -97,7 +98,7 @@ void scan_in(int pal) {
     #endif
 }
 
-void scan2_in(/*int pal*/) {
+void scan2_in(int pal) {
 
     while ( !(_PIO->irq & (1<<6)) ) _PIO->rxf[_SM];  // sync with vsync_in, empty FIFO
 
@@ -105,8 +106,8 @@ void scan2_in(/*int pal*/) {
     gpio_put(TP_FRMBUF_IN, 1);
     #endif
 
-    for (uint y = 0; y < prelines; y++) {
-        for (uint x = 0; x < xscanlrd; x+=4) {
+    for (uint y = 0; y < ttlmode->prelines; y++) {
+        for (uint x = 0; x < ttlmode->xscanlrd; x+=4) {
             while (pio_sm_is_rx_fifo_empty(_PIO, _SM)) tight_loop_contents();
             _PIO->rxf[_SM];
         }
@@ -118,8 +119,53 @@ void scan2_in(/*int pal*/) {
     #endif
 
     uint n = 0;
-    for (uint y = 0; y < ylinesrd; y++, n++) {  //n = 0 .. 3*ylinesrd/2
-        for (uint x = 0; x < xscanlrd; x+=4) {
+    for (uint y = 0; y < ttlmode->ylinesrd; y++, n++) {  //n = 0 .. 3*ylinesrd/2
+        for (uint x = 0; x < ttlmode->xscanlrd; x+=4) {
+            while (pio_sm_is_rx_fifo_empty(_PIO, _SM)) tight_loop_contents();
+            uint32_t col4 = _PIO->rxf[_SM] & 0x3F3F3F3F;
+            if (pal)
+            {
+                if ( col4 & 0x00000004 ) col4 |= 0x00000015;
+                if ( col4 & 0x00000400 ) col4 |= 0x00001500;
+                if ( col4 & 0x00040000 ) col4 |= 0x00150000;
+                if ( col4 & 0x04000000 ) col4 |= 0x15000000;
+            }
+            *((uint32_t*)(vga_data_array+(VGALNBF*n + x))) = col4;
+        }
+        if (y & 1) {  // duplicate every second line
+            memcpy(vga_data_array+VGALNBF*(n+1), vga_data_array+VGALNBF*n, ttlmode->xscanlrd);
+            n++;
+        }
+    }
+
+    #if DBG_PIN
+    gpio_put(TP_FRMBUF_IN, 0);
+    #endif
+}
+
+void scan2ega_in(/*int pal*/) {
+
+    while ( !(_PIO->irq & (1<<6)) ) _PIO->rxf[_SM];  // sync with vsync_in, empty FIFO
+
+    #if DBG_PIN
+    gpio_put(TP_FRMBUF_IN, 1);
+    #endif
+
+    for (uint y = 0; y < ttlmode->prelines; y++) {
+        for (uint x = 0; x < ttlmode->xscanlrd; x+=4) {
+            while (pio_sm_is_rx_fifo_empty(_PIO, _SM)) tight_loop_contents();
+            _PIO->rxf[_SM];
+        }
+    }
+
+    #if DBG_PIN
+    gpio_put(TP_FRMBUF_IN, 0);
+    gpio_put(TP_FRMBUF_IN, 1);
+    #endif
+
+    uint n = 0;
+    for (uint y = 0; y < ttlmode->ylinesrd; y++, n++) {  //n = 0 .. 3*ylinesrd/2
+        for (uint x = 0; x < ttlmode->xscanlrd; x+=4) {
             while (pio_sm_is_rx_fifo_empty(_PIO, _SM)) tight_loop_contents();
             uint32_t col4 = _PIO->rxf[_SM] & 0x3F3F3F3F;
             /*
@@ -134,7 +180,7 @@ void scan2_in(/*int pal*/) {
             *((uint32_t*)(vga_data_array+(VGALNBF*n + x))) = col4;
         }
         if (y & 1) {  // duplicate every second line
-            memcpy(vga_data_array+VGALNBF*(n+1), vga_data_array+VGALNBF*n, xscanlrd);
+            memcpy(vga_data_array+VGALNBF*(n+1), vga_data_array+VGALNBF*n, ttlmode->xscanlrd);
             n++;
         }
     }
@@ -152,8 +198,8 @@ void scan2cga_in(/*int pal*/) {
     gpio_put(TP_FRMBUF_IN, 1);
     #endif
 
-    for (uint y = 0; y < prelines; y++) {
-        for (uint x = 0; x < xscanlrd; x+=4) {
+    for (uint y = 0; y < ttlmode->prelines; y++) {
+        for (uint x = 0; x < ttlmode->xscanlrd; x+=4) {
             while (pio_sm_is_rx_fifo_empty(_PIO, _SM)) tight_loop_contents();
             _PIO->rxf[_SM];
         }
@@ -165,8 +211,8 @@ void scan2cga_in(/*int pal*/) {
     #endif
 
     uint n = 0;
-    for (uint y = 0; y < ylinesrd; y++, n++) {  //n = 0 .. 3*ylinesrd/2
-        for (uint x = 0; x < xscanlrd; x+=4) {
+    for (uint y = 0; y < ttlmode->ylinesrd; y++, n++) {  //n = 0 .. 3*ylinesrd/2
+        for (uint x = 0; x < ttlmode->xscanlrd; x+=4) {
             while (pio_sm_is_rx_fifo_empty(_PIO, _SM)) tight_loop_contents();
             uint32_t col4 = _PIO->rxf[_SM] & 0x3F3F3F3F;
             //if (pal == PAL_CGA)
@@ -179,7 +225,7 @@ void scan2cga_in(/*int pal*/) {
             *((uint32_t*)(vga_data_array+(VGALNBF*n + x))) = col4;
         }
         if (y & 1) {  // duplicate every second line
-            memcpy(vga_data_array+VGALNBF*(n+1), vga_data_array+VGALNBF*n, xscanlrd);
+            memcpy(vga_data_array+VGALNBF*(n+1), vga_data_array+VGALNBF*n, ttlmode->xscanlrd);
             n++;
         }
     }
@@ -202,19 +248,14 @@ int main() {
     uint32_t t1 = 0;
     uint32_t dt = 0;
 
-    uint hpix = LINE_EGA;
-    int pal = PAL_EGA;
-    int vmode = EGA2,
-        vmode0 = vmode;
+    uint16_t hpix = LINE_EGA;
+    uint16_t hscan0 = ttlmode->xscanlrd;
 
-    int clkadj_14M = 0,
-        clkadj014M = clkadj_14M;
-    int clkadj_16M = 0,
-        clkadj016M = clkadj_16M;
-    int clkadj_MDA = 0,
-        clkadj0MDA = clkadj_MDA;
-    int divfrac = DIV16M_FRAC,
-        divfrac0 = divfrac;
+    int vmode = ttlmode->vmode,
+        vmode0 = vmode;
+    int toggle_hscan = 0;
+    int pal = 0;
+    int divfrac0 = ttlmode->div_frac;
 
     uint32_t avg = 0;
     uint32_t n = 0;
@@ -267,7 +308,8 @@ int main() {
     set_sys_clock_pll(vco_freq, post_div1, post_div2);
     
 
-    ttlIn_Init_16MHz(DIV16M_INT, DIV16M_FRAC, LINE_EGA);
+    // MDA or EGA2
+    ttlIn_Init_Vminus(ttlmode);
 
 
     while ( !(_PIO->irq & (1<<6)) ) ; // irq6 == vsync_in
@@ -279,7 +321,10 @@ int main() {
 
     while (1)
     {
-        vmode == CGAEGA ? (pal == PAL_CGA ? scan2cga_in() : scan2_in()) : scan_in(pal);  // 50-60 Hz
+        pal = (ttlmode->pal & 0x1);
+
+        //ttlmode->vmode == CGAEGA ? (pal ? scan2cga_in() : scan2ega_in()) : scan_in(pal);  // 50-60 Hz
+        ttlmode->vmode == CGAEGA ? scan2_in(pal) : scan_in(pal);  // 50-60 Hz
 
         cnt += 1;
         if (cnt == 10) {  // 5-6 Hz
@@ -311,49 +356,88 @@ int main() {
 
             #if TOGGLEPAL
             if (gpio_get(BUTTON_PAL) == 0) {
-                if (vmode == CGAEGA) pal = (pal != PAL_CGA) ? PAL_CGA : PAL_EGA;
-                if (vmode == MDA   ) pal = (pal != PAL_MDA) ? PAL_MDA : PAL_EGA;
+                switch (ttlmode->vmode)
+                {
+                    case CGAEGA:// pal = (pal != PAL_CGA) ? PAL_CGA : PAL_EGA;
+                                ttlmode->pal ^= 0x1;
+                                break;
+                    case MDA:   // pal = (pal != PAL_MDA) ? PAL_MDA : PAL_EGA;
+                                hscan0 = ttlmode->xscanlrd;
+                                ttlmode->pal += 1;
+                                ttlmode->pal &= 0x3;
+                                ttlmode->xscanlrd = (ttlmode->pal & 0x2) ? 640 : 720;
+                                if (ttlmode->xscanlrd != hscan0) {
+                                    toggle_hscan = 1;
+                                    float d0 = ttlmode->div_int + ttlmode->div_frac/256.0f;
+                                    float d1 = d0 * hscan0/(float)ttlmode->xscanlrd;
+                                    // hscan0/xscanlrd == (pal & 0x2) ? 8/9 : 9/8
+                                    ttlmode->div_int = (uint16_t)d1;
+                                    ttlmode->div_frac = (int16_t)((d1-ttlmode->div_int)*256.0f);
+                                    if (ttlmode->div_int > 2) {
+                                        ttlmode->div_int = 2;
+                                        ttlmode->div_frac = 255;
+                                    }
+                                    if (ttlmode->div_int < 1) {
+                                        ttlmode->div_int = 1;
+                                        ttlmode->div_frac = 0;
+                                    }
+                                }
+                                break;
+                }
             }
-            if (pal == PAL_MDA && vmode != MDA   ) pal = PAL_EGA; // LINE_MDA: vmode==MDA
-            if (pal == PAL_CGA && vmode != CGAEGA) pal = PAL_EGA; // pol_VSYNC==0: vmode==EGA2,MDA
             #endif
 
             #if ADJ_CLK
             if (gpio_get(BUTTON_PLS) == 0) {
-                if (vmode == CGAEGA && DIV14M_FRAC+clkadj_14M < 255) clkadj_14M += 1;
-                if (vmode == EGA2   && DIV16M_FRAC+clkadj_16M < 255) clkadj_16M += 1;
-                if (vmode == MDA    && DIVMDA_FRAC+clkadj_MDA < 255) clkadj_MDA += 1;
+                ttlmode->div_frac += 1;
+                if (ttlmode->div_frac > 255) {
+                    ttlmode->div_int += 1;
+                    ttlmode->div_frac = 0;
+                }
+                if (ttlmode->div_int > 2) {
+                    ttlmode->div_int = 2;
+                    ttlmode->div_frac = 255;
+                }
             }
             if (gpio_get(BUTTON_MIN) == 0) {
-                if (vmode == CGAEGA && DIV14M_FRAC+clkadj_14M > 0) clkadj_14M -= 1;
-                if (vmode == EGA2   && DIV16M_FRAC+clkadj_16M > 0) clkadj_16M -= 1;
-                if (vmode == MDA    && DIVMDA_FRAC+clkadj_MDA > 0) clkadj_MDA -= 1;
+                ttlmode->div_frac -= 1;
+                if (ttlmode->div_frac < 0) {
+                    ttlmode->div_int -= 1;
+                    ttlmode->div_frac = 255;
+                }
+                if (ttlmode->div_int < 1) {
+                    ttlmode->div_int = 1;
+                    ttlmode->div_frac = 0;
+                }
             }
             #endif
 
-            if      (vmode == CGAEGA) divfrac = DIV14M_FRAC+clkadj_14M;
-            else if (vmode == EGA2  ) divfrac = DIV16M_FRAC+clkadj_16M;
-            else                      divfrac = DIVMDA_FRAC+clkadj_MDA;
 
-            if (vmode != vmode0 || divfrac != divfrac0) {
+            if (vmode != vmode0 || ttlmode->div_frac != divfrac0 || toggle_hscan) {
                 //float fq = 1e7/dt;
+
+                toggle_hscan = 0;
+
+                if (vmode != vmode0)
+                {
+                    switch (vmode)
+                    {
+                        case CGAEGA:
+                                    ttlmode = &mode_CGAEGA;
+                                    break;
+                        case EGA2:  // MDA720
+                                    ttlmode = &mode_EGA2;
+                                    break;
+                        case MDA:   // if MDA640, this is 14MHz, but same EGA2 polarity
+                                    ttlmode = &mode_MDA;
+                                    break;
+                    }
+                }
 
                 reset_TTLin(_PIO);
 
-                // pol_VSYNC > 0 ? ttlIn_Init_14MHz(DIV14M_INT, divfrac)
-                //               : ttlIn_Init_16MHz(DIV16M_INT, divfrac, vmode);
-                switch (vmode)
-                {
-                    case CGAEGA:
-                                ttlIn_Init_14MHz(DIV14M_INT, divfrac);
-                                break;
-                    case EGA2:  // MDA720
-                                ttlIn_Init_16MHz(DIV16M_INT, divfrac, vmode);
-                                break;
-                    case MDA:   // if MDA640, this is 14MHz, but same EGA2 polarity
-                                ttlIn_Init_16MHz(DIVMDA_INT, divfrac, vmode);
-                                break;
-                }
+                pol_VSYNC > 0 ? ttlIn_Init_Vplus(ttlmode)
+                              : ttlIn_Init_Vminus(ttlmode);
 
                 memset(vga_data_array, 0, FRMBUFSZ);
                 // pixel clock 14MHz:
@@ -363,32 +447,45 @@ int main() {
                 //      H:22kHz,V=60Hz -> 640 pixel/line EGA_Mode2
 
                 #if DBG_USB
-                printf("MODE:%d,%d DIVFRAC:%d,%d\n", vmode, vmode0, divfrac, divfrac0);
+                printf("MODE:%d,%d DIVFRAC:%d,%d\n", vmode, vmode0, ttlmode->div_frac, divfrac0);
                 #endif
             }
 
             vmode0 = vmode;
-            clkadj014M = clkadj_14M;
-            clkadj016M = clkadj_16M;
-            clkadj0MDA = clkadj_MDA;
-            divfrac0 = divfrac;
+            divfrac0 = ttlmode->div_frac;
 
             t0 = t1;
             cnt = 0;
 
             #if ADJ_CLK
             if (gpio_get(BUTTON_OSD) == 0) {
-                sprintf(txtbuf, "Mode: %s", modestr[vmode]);
-                wrtxt(20, 20, txtbuf, 0x3F);
+                sprintf(txtbuf, "Mode : %s", modestr[vmode]);
+                wrtxt(40, 20, txtbuf, 0x3F);
                 sprintf(txtbuf,  "hpix = %3d", hpix);
-                wrtxt(20, 30, txtbuf, 0x3F);
-                sprintf(txtbuf, "divfrac = %d", divfrac);
-                wrtxt(20, 40, txtbuf, 0x3F);
+                wrtxt(40, 30, txtbuf, 0x3F);
                 if (dt > 0) {
                     float fq = 1e7/dt;
                     sprintf(txtbuf, "V = %+.2fHz", pol_VSYNC>0 ? fq : -fq);
-                    wrtxt(20, 50, txtbuf, 0x3F);
+                    wrtxt(40, 40, txtbuf, 0x3F);
                 }
+
+                sprintf(txtbuf, "div  = (%d,%d)", ttlmode->div_int, ttlmode->div_frac);
+                wrtxt(40, 50, txtbuf, 0x3F);
+                // CLKkHZ/1e3 / PCLK = 114.0/4=28.5
+                float pxclk = (114.0f/4.0f)/(ttlmode->div_int + ttlmode->div_frac/256.0f);
+                sprintf(txtbuf, "pix_clk = %.3f MHz", pxclk);
+                wrtxt(40, 60, txtbuf, 0x3F);
+
+                sprintf(txtbuf, "Mode set: %s", modestr[ttlmode->vmode]);
+                wrtxt(40, 80, txtbuf, 0x3F);
+                sprintf(txtbuf, "hscan   = %d", ttlmode->xscanlrd);
+                wrtxt(40, 90, txtbuf, 0x3F);
+                sprintf(txtbuf, "pal     = %d", ttlmode->pal);
+                wrtxt(40, 100, txtbuf, 0x3F);
+
+                sprintf(txtbuf, "(pal) = %d", pal);
+                wrtxt(40, 120, txtbuf, 0x3F);
+
                 sleep_ms(4000);
                 //
                 memset(vga_data_array, 0, FRMBUFSZ);
