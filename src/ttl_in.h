@@ -67,7 +67,7 @@ typedef struct {
 // ET3000:(1,222-223..240)
 //V+
 // DIV:(2,77)   // (2,51..122)
-// OAK:(2,51..55..77)
+// OAK:(2,51..55..77) , (2,3)=2+3/256 -> 14.167MHz no jitter, line to long due to no h-offset
 // ET3000:(2,122)
 */
 

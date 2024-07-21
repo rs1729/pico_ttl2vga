@@ -63,6 +63,11 @@ Tested only with OAK067 and ET3000 EGA/VGA graphics cards.
    ttlmode_t mode_CGAEGA { .div_int  = 2, .div_frac =  77 }
    ```
    (can be adjusted using `BUTTON_PLS`/`BUTTON_MIN`)<br />
+   For OAK067,
+   ```C
+   ttlmode_t mode_CGAEGA { .div_int  = 2, .div_frac =  3 }  // 14.167MHz
+   ```
+   shows no jitter, however the scan line is too long at this frequency. (TODO: back porch/horizontal scan offset.)<br />
    In EGA Mode 2 there should be 350 visible lines, 13 lines vertical sync, and 364 total lines, i.e. not much room for front/back porch.<br />
    640x350 EGA Mode 2:<br />
    ![EGA2_640x350](EGA2_640x350.png)<br />
