@@ -10,6 +10,7 @@ mov y, osr
 mov x, y                    ; Initialize counter variable
 
 wait 1 irq 4 [2]            ; Wait for hsync active mode
+irq clear 7
 
 pixel:
     nop

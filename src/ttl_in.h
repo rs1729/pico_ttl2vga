@@ -53,6 +53,7 @@ typedef struct {
     uint16_t vline_px;
     uint16_t div_int;
     int16_t  div_frac;
+    int16_t  h_offset;
     uint16_t prelines;
     uint16_t xscanlrd;
     uint16_t ylinesrd;
@@ -87,12 +88,14 @@ static char *modestr[] = {
     [EGA2]    = "EGA2"
 };
 
+static const int16_t OFS_STEP = 1;  //8
 
 static ttlmode_t mode_MDA = {
     .vmode    = MDA,
     .hline_px = 720,
-    .div_int  = 1,
-    .div_frac = 232,
+    .div_int  = 2,
+    .div_frac = 4,    //720px: (2,4) -> 14.140MHz , 640px: (2,68) -> 12.579MHz
+    .h_offset = 144,
     .prelines = 1,
     .xscanlrd = 720,  // default:720 , compressed:640
     .ylinesrd = 351,
@@ -103,7 +106,8 @@ static ttlmode_t mode_CGAEGA = {
     .vmode    = CGAEGA,
     .hline_px = 640,
     .div_int  = 2,
-    .div_frac = 77,
+    .div_frac = 89,
+    .h_offset = 440,
     .prelines = 30,
     .xscanlrd = 640,
     .ylinesrd = 208,
@@ -114,8 +118,9 @@ static ttlmode_t mode_EGA2 = {
     .vmode    = EGA2,
     .hline_px = 640,
     .div_int  = 1,
-    .div_frac = 207,
-    .prelines = 1,
+    .div_frac = 215,
+    .h_offset = 160,
+    .prelines = 2,
     .xscanlrd = 640,
     .ylinesrd = 351,
     .pal      = 0
@@ -127,6 +132,7 @@ static ttlmode_t mode_MDA640 = {
     .hline_px = 720,
     .div_int  = 2,
     .div_frac = 77,
+    .h_offset = 0,
     .prelines = 1,
     .xscanlrd = 640,
     .ylinesrd = 351
@@ -137,6 +143,7 @@ static ttlmode_t _mode_CGA = {
     .hline_px = 640,
     .div_int  = 2,
     .div_frac = 77,
+    .h_offset = 0,
     .prelines = 30,
     .xscanlrd = 640,
     .ylinesrd = 208
@@ -146,6 +153,7 @@ static ttlmode_t _mode_EGA = {
     .hline_px = 640,
     .div_int  = 2,
     .div_frac = 77,
+    .h_offset = 0,
     .prelines = 30,
     .xscanlrd = 640,
     .ylinesrd = 208

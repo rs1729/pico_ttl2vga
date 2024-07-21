@@ -63,13 +63,19 @@ ttlmode_t *ttlmode = &mode_EGA2;
 
 void scan_in(int pal) {
 
-    while ( !(_PIO->irq & (1<<6)) ) _PIO->rxf[_SM];  // sync with vsync_in, empty FIFO
+    while ( !(_PIO->irq & (1u<<6)) ) _PIO->rxf[_SM];  // sync with vsync_in, empty FIFO
 
     #if DBG_PIN
     gpio_put(TP_FRMBUF_IN, 1);
     #endif
 
     for (uint y = 0; y < ttlmode->prelines; y++) {
+
+        // BP / h-offset
+        while ( !(_PIO->irq & (1u<<7)) ) {};
+        busy_wait_at_least_cycles(ttlmode->h_offset);
+        pio_sm_exec(_PIO, _SM, 0xc004); // 0xc004: irq nowait 4
+
         for (uint x = 0; x < ttlmode->xscanlrd; x+=4) {
             while (pio_sm_is_rx_fifo_empty(_PIO, _SM)) tight_loop_contents();
             _PIO->rxf[_SM];
@@ -82,6 +88,12 @@ void scan_in(int pal) {
     #endif
 
     for (uint y = 0; y < ttlmode->ylinesrd; y++) {
+
+        // BP / h-offset
+        while ( !(_PIO->irq & (1u<<7)) ) {};
+        busy_wait_at_least_cycles(ttlmode->h_offset);
+        pio_sm_exec(_PIO, _SM, 0xc004); // 0xc004: irq nowait 4
+
         for (uint x = 0; x < ttlmode->xscanlrd; x+=4) {
             while (pio_sm_is_rx_fifo_empty(_PIO, _SM)) tight_loop_contents();
             uint32_t col4 = _PIO->rxf[_SM] & 0x3F3F3F3F;
@@ -100,13 +112,18 @@ void scan_in(int pal) {
 
 void scan2_in(int pal) {
 
-    while ( !(_PIO->irq & (1<<6)) ) _PIO->rxf[_SM];  // sync with vsync_in, empty FIFO
+    while ( !(_PIO->irq & (1u<<6)) ) _PIO->rxf[_SM];  // sync with vsync_in, empty FIFO
 
     #if DBG_PIN
     gpio_put(TP_FRMBUF_IN, 1);
     #endif
 
     for (uint y = 0; y < ttlmode->prelines; y++) {
+
+        while ( !(_PIO->irq & (1u<<7)) ) {};
+        busy_wait_at_least_cycles(ttlmode->h_offset);
+        pio_sm_exec(_PIO, _SM, 0xc004); // 0xc004: irq nowait 4
+
         for (uint x = 0; x < ttlmode->xscanlrd; x+=4) {
             while (pio_sm_is_rx_fifo_empty(_PIO, _SM)) tight_loop_contents();
             _PIO->rxf[_SM];
@@ -120,6 +137,12 @@ void scan2_in(int pal) {
 
     uint n = 0;
     for (uint y = 0; y < ttlmode->ylinesrd; y++, n++) {  //n = 0 .. 3*ylinesrd/2
+
+        // BP / h-offset
+        while ( !(_PIO->irq & (1u<<7)) ) {};
+        busy_wait_at_least_cycles(ttlmode->h_offset);
+        pio_sm_exec(_PIO, _SM, 0xc004); // 0xc004: irq nowait 4
+
         for (uint x = 0; x < ttlmode->xscanlrd; x+=4) {
             while (pio_sm_is_rx_fifo_empty(_PIO, _SM)) tight_loop_contents();
             uint32_t col4 = _PIO->rxf[_SM] & 0x3F3F3F3F;
@@ -145,13 +168,19 @@ void scan2_in(int pal) {
 
 void scan2ega_in(/*int pal*/) {
 
-    while ( !(_PIO->irq & (1<<6)) ) _PIO->rxf[_SM];  // sync with vsync_in, empty FIFO
+    while ( !(_PIO->irq & (1u<<6)) ) _PIO->rxf[_SM];  // sync with vsync_in, empty FIFO
 
     #if DBG_PIN
     gpio_put(TP_FRMBUF_IN, 1);
     #endif
 
     for (uint y = 0; y < ttlmode->prelines; y++) {
+
+        // BP / h-offset
+        while ( !(_PIO->irq & (1u<<7)) ) {};
+        busy_wait_at_least_cycles(ttlmode->h_offset);
+        pio_sm_exec(_PIO, _SM, 0xc004); // 0xc004: irq nowait 4
+
         for (uint x = 0; x < ttlmode->xscanlrd; x+=4) {
             while (pio_sm_is_rx_fifo_empty(_PIO, _SM)) tight_loop_contents();
             _PIO->rxf[_SM];
@@ -165,7 +194,13 @@ void scan2ega_in(/*int pal*/) {
 
     uint n = 0;
     for (uint y = 0; y < ttlmode->ylinesrd; y++, n++) {  //n = 0 .. 3*ylinesrd/2
-        for (uint x = 0; x < ttlmode->xscanlrd; x+=4) {
+
+        // BP / h-offset
+        while ( !(_PIO->irq & (1u<<7)) ) {};
+        busy_wait_at_least_cycles(ttlmode->h_offset);
+        pio_sm_exec(_PIO, _SM, 0xc004); // 0xc004: irq nowait 4
+
+       for (uint x = 0; x < ttlmode->xscanlrd; x+=4) {
             while (pio_sm_is_rx_fifo_empty(_PIO, _SM)) tight_loop_contents();
             uint32_t col4 = _PIO->rxf[_SM] & 0x3F3F3F3F;
             /*
@@ -192,13 +227,19 @@ void scan2ega_in(/*int pal*/) {
 
 void scan2cga_in(/*int pal*/) {
 
-    while ( !(_PIO->irq & (1<<6)) ) _PIO->rxf[_SM];  // sync with vsync_in, empty FIFO
+    while ( !(_PIO->irq & (1u<<6)) ) _PIO->rxf[_SM];  // sync with vsync_in, empty FIFO
 
     #if DBG_PIN
     gpio_put(TP_FRMBUF_IN, 1);
     #endif
 
     for (uint y = 0; y < ttlmode->prelines; y++) {
+
+        // BP / h-offset
+        while ( !(_PIO->irq & (1u<<7)) ) {};
+        busy_wait_at_least_cycles(ttlmode->h_offset);
+        pio_sm_exec(_PIO, _SM, 0xc004); // 0xc004: irq nowait 4
+
         for (uint x = 0; x < ttlmode->xscanlrd; x+=4) {
             while (pio_sm_is_rx_fifo_empty(_PIO, _SM)) tight_loop_contents();
             _PIO->rxf[_SM];
@@ -212,6 +253,12 @@ void scan2cga_in(/*int pal*/) {
 
     uint n = 0;
     for (uint y = 0; y < ttlmode->ylinesrd; y++, n++) {  //n = 0 .. 3*ylinesrd/2
+
+        // BP / h-offset
+        while ( !(_PIO->irq & (1u<<7)) ) {};
+        busy_wait_at_least_cycles(ttlmode->h_offset);
+        pio_sm_exec(_PIO, _SM, 0xc004); // 0xc004: irq nowait 4
+
         for (uint x = 0; x < ttlmode->xscanlrd; x+=4) {
             while (pio_sm_is_rx_fifo_empty(_PIO, _SM)) tight_loop_contents();
             uint32_t col4 = _PIO->rxf[_SM] & 0x3F3F3F3F;
@@ -241,6 +288,79 @@ void reset_TTLin() {
 }
 
 
+void inc_clk() {
+    ttlmode->div_frac += 1;
+    if (ttlmode->div_frac > 255) {
+        ttlmode->div_int += 1;
+        ttlmode->div_frac = 0;
+    }
+    if (ttlmode->div_int > 2) {
+        ttlmode->div_int = 2;
+        ttlmode->div_frac = 255;
+    }
+}
+
+void dec_clk() {
+    ttlmode->div_frac -= 1;
+    if (ttlmode->div_frac < 0) {
+        ttlmode->div_int -= 1;
+        ttlmode->div_frac = 255;
+    }
+    if (ttlmode->div_int < 1) {
+        ttlmode->div_int = 1;
+        ttlmode->div_frac = 0;
+    }
+}
+
+void inc_hofs() {
+    ttlmode->h_offset += OFS_STEP;
+    if (ttlmode->h_offset > 1023) ttlmode->h_offset = 1023;
+}
+void dec_hofs() {
+    ttlmode->h_offset -= OFS_STEP;
+    if (ttlmode->h_offset < 0) ttlmode->h_offset = 0;
+}
+
+int toggle_pal() {
+    int _toggle_hscan = 0;
+    uint16_t hscan0 = ttlmode->xscanlrd;
+    switch (ttlmode->vmode)
+    {
+        case CGAEGA:// pal = (pal != PAL_CGA) ? PAL_CGA : PAL_EGA;
+                    ttlmode->pal ^= 0x1;
+                    break;
+        case MDA:   // pal = (pal != PAL_MDA) ? PAL_MDA : PAL_EGA;
+                    hscan0 = ttlmode->xscanlrd;
+                    ttlmode->pal += 1;
+                    ttlmode->pal &= 0x3;
+                    ttlmode->xscanlrd = (ttlmode->pal & 0x2) ? 640 : 720;
+                    if (ttlmode->xscanlrd != hscan0) {
+                        _toggle_hscan = 1;
+                        float d0 = ttlmode->div_int + ttlmode->div_frac/256.0f;
+                        float d1 = d0 * hscan0/(float)ttlmode->xscanlrd;
+                        // hscan0/xscanlrd == (pal & 0x2) ? 8/9 : 9/8
+                        ttlmode->div_int = (uint16_t)d1;
+                        ttlmode->div_frac = (int16_t)((d1-ttlmode->div_int)*256.0f);
+                        if (ttlmode->div_int > 2) {
+                            ttlmode->div_int = 2;
+                            ttlmode->div_frac = 255;
+                        }
+                        if (ttlmode->div_int < 1) {
+                            ttlmode->div_int = 1;
+                            ttlmode->div_frac = 0;
+                        }
+                    }
+                    break;
+    }
+    return _toggle_hscan;
+}
+
+// OSD menu
+const int menu_posX = 50;
+enum menu_items { MENU_CLK=0, MENU_hOFS, MENU_PAL };
+int menu_pos[] = { 60, 70, 90 };
+int menu_select = 0;
+
 int main() {
 
     //uint64_t t0 = -1 //time_us_64()
@@ -249,19 +369,20 @@ int main() {
     uint32_t dt = 0;
 
     uint16_t hpix = LINE_EGA;
-    uint16_t hscan0 = ttlmode->xscanlrd;
 
     int vmode = ttlmode->vmode,
         vmode0 = vmode;
-    int toggle_hscan = 0;
     int pal = 0;
-    int divfrac0 = ttlmode->div_frac;
+    int toggle_hscan = 0;
+    int adj_clk = 0;
 
     uint32_t avg = 0;
     uint32_t n = 0;
     uint8_t avgbuff[5] = {0};
     uint8_t pol_VSYNC = 0;  // 1:V+ , 0:V-
     uint8_t cnt = 0;
+
+    uint32_t vm_fail_cnt = 0;
 
     char txtbuf[32] = { 0 };
 
@@ -312,19 +433,29 @@ int main() {
     ttlIn_Init_Vminus(ttlmode);
 
 
-    while ( !(_PIO->irq & (1<<6)) ) ; // irq6 == vsync_in
+    while ( !(_PIO->irq & (1u<<6)) ) ; // irq6 == vsync_in
     sleep_ms(2);
     initVGA();
-
 
     sleep_ms(100);
 
     while (1)
     {
+        if (vm_fail_cnt > 5) {
+            // RESET Vfreq
+            t0 = -1;
+            t1 = 0;
+            dt = 0;
+            vm_fail_cnt = 0;
+        }
+
         pal = (ttlmode->pal & 0x1);
 
-        //ttlmode->vmode == CGAEGA ? (pal ? scan2cga_in() : scan2ega_in()) : scan_in(pal);  // 50-60 Hz
+        #if 0
+        ttlmode->vmode == CGAEGA ? (pal ? scan2cga_in() : scan2ega_in()) : scan_in(pal);  // 50-60 Hz
+        #else
         ttlmode->vmode == CGAEGA ? scan2_in(pal) : scan_in(pal);  // 50-60 Hz
+        #endif
 
         cnt += 1;
         if (cnt == 10) {  // 5-6 Hz
@@ -352,71 +483,45 @@ int main() {
             // pol_VSYNC == 0 (-) , hpix == LINE_MDA (V=50Hz)  -->  VID MODE = MDA
             // pol_VSYNC == 0 (-) , hpix == LINE_EGA (V=60Hz)  -->  VID MODE = EGA2
             // pol_VSYNC == 1 (+)                              -->  VID MODE = CGA/EGA
-            vmode = (pol_VSYNC > 0) ? CGAEGA : (hpix==LINE_MDA ? MDA : EGA2);
+            if (dt < 227272) {
+                vmode = (pol_VSYNC > 0) ? CGAEGA : (hpix==LINE_MDA ? MDA : EGA2);
+            }
+            else {
+                vm_fail_cnt += 1;
+            }
+
 
             #if TOGGLEPAL
             if (gpio_get(BUTTON_PAL) == 0) {
-                switch (ttlmode->vmode)
-                {
-                    case CGAEGA:// pal = (pal != PAL_CGA) ? PAL_CGA : PAL_EGA;
-                                ttlmode->pal ^= 0x1;
-                                break;
-                    case MDA:   // pal = (pal != PAL_MDA) ? PAL_MDA : PAL_EGA;
-                                hscan0 = ttlmode->xscanlrd;
-                                ttlmode->pal += 1;
-                                ttlmode->pal &= 0x3;
-                                ttlmode->xscanlrd = (ttlmode->pal & 0x2) ? 640 : 720;
-                                if (ttlmode->xscanlrd != hscan0) {
-                                    toggle_hscan = 1;
-                                    float d0 = ttlmode->div_int + ttlmode->div_frac/256.0f;
-                                    float d1 = d0 * hscan0/(float)ttlmode->xscanlrd;
-                                    // hscan0/xscanlrd == (pal & 0x2) ? 8/9 : 9/8
-                                    ttlmode->div_int = (uint16_t)d1;
-                                    ttlmode->div_frac = (int16_t)((d1-ttlmode->div_int)*256.0f);
-                                    if (ttlmode->div_int > 2) {
-                                        ttlmode->div_int = 2;
-                                        ttlmode->div_frac = 255;
-                                    }
-                                    if (ttlmode->div_int < 1) {
-                                        ttlmode->div_int = 1;
-                                        ttlmode->div_frac = 0;
-                                    }
-                                }
-                                break;
-                }
+                toggle_hscan = toggle_pal();
             }
             #endif
 
             #if ADJ_CLK
             if (gpio_get(BUTTON_PLS) == 0) {
-                ttlmode->div_frac += 1;
-                if (ttlmode->div_frac > 255) {
-                    ttlmode->div_int += 1;
-                    ttlmode->div_frac = 0;
-                }
-                if (ttlmode->div_int > 2) {
-                    ttlmode->div_int = 2;
-                    ttlmode->div_frac = 255;
+                switch (menu_select)
+                {
+                    case MENU_CLK : inc_clk(); adj_clk = 1; break;
+                    case MENU_hOFS: inc_hofs(); break;
+                    //case MENU_PAL : toggle_pal(); break;
                 }
             }
             if (gpio_get(BUTTON_MIN) == 0) {
-                ttlmode->div_frac -= 1;
-                if (ttlmode->div_frac < 0) {
-                    ttlmode->div_int -= 1;
-                    ttlmode->div_frac = 255;
-                }
-                if (ttlmode->div_int < 1) {
-                    ttlmode->div_int = 1;
-                    ttlmode->div_frac = 0;
+                switch (menu_select)
+                {
+                    case MENU_CLK : dec_clk(); adj_clk = 1; break;
+                    case MENU_hOFS: dec_hofs(); break;
                 }
             }
             #endif
 
 
-            if (vmode != vmode0 || ttlmode->div_frac != divfrac0 || toggle_hscan) {
+            if (vmode != vmode0 || adj_clk|| toggle_hscan) {
                 //float fq = 1e7/dt;
 
+                adj_clk = 0;
                 toggle_hscan = 0;
+                vm_fail_cnt = 0;
 
                 if (vmode != vmode0)
                 {
@@ -435,6 +540,7 @@ int main() {
                 }
 
                 reset_TTLin(_PIO);
+                sleep_ms(100);
 
                 pol_VSYNC > 0 ? ttlIn_Init_Vplus(ttlmode)
                               : ttlIn_Init_Vminus(ttlmode);
@@ -447,12 +553,11 @@ int main() {
                 //      H:22kHz,V=60Hz -> 640 pixel/line EGA_Mode2
 
                 #if DBG_USB
-                printf("MODE:%d,%d DIVFRAC:%d,%d\n", vmode, vmode0, ttlmode->div_frac, divfrac0);
+                printf("MODE:%d,%d DIVFRAC:%d\n", vmode, vmode0, ttlmode->div_frac);
                 #endif
             }
 
             vmode0 = vmode;
-            divfrac0 = ttlmode->div_frac;
 
             t0 = t1;
             cnt = 0;
@@ -460,33 +565,85 @@ int main() {
             #if ADJ_CLK
             if (gpio_get(BUTTON_OSD) == 0) {
                 sprintf(txtbuf, "Mode : %s", modestr[vmode]);
-                wrtxt(40, 20, txtbuf, 0x3F);
+                wrtxt(menu_posX, 20, txtbuf, 0x3F);
                 sprintf(txtbuf,  "hpix = %3d", hpix);
-                wrtxt(40, 30, txtbuf, 0x3F);
+                wrtxt(menu_posX, 30, txtbuf, 0x3F);
                 if (dt > 0) {
                     float fq = 1e7/dt;
                     sprintf(txtbuf, "V = %+.2fHz", pol_VSYNC>0 ? fq : -fq);
-                    wrtxt(40, 40, txtbuf, 0x3F);
+                    wrtxt(menu_posX, 40, txtbuf, 0x3F);
                 }
 
                 sprintf(txtbuf, "div  = (%d,%d)", ttlmode->div_int, ttlmode->div_frac);
-                wrtxt(40, 50, txtbuf, 0x3F);
+                wrtxt(menu_posX, 50, txtbuf, 0x3F);
                 // CLKkHZ/1e3 / PCLK = 114.0/4=28.5
                 float pxclk = (114.0f/4.0f)/(ttlmode->div_int + ttlmode->div_frac/256.0f);
-                sprintf(txtbuf, "pix_clk = %.3f MHz", pxclk);
-                wrtxt(40, 60, txtbuf, 0x3F);
+                sprintf(txtbuf, "pix_clk = %.3fMHz", pxclk);
+                wrtxt(menu_posX, menu_pos[MENU_CLK], txtbuf, 0x3F);
+                sprintf(txtbuf, "hoffset = %d", ttlmode->h_offset);
+                wrtxt(menu_posX, menu_pos[MENU_hOFS], txtbuf, 0x3F);
+                sprintf(txtbuf, "pal     = %d", ttlmode->pal);
+                wrtxt(menu_posX, menu_pos[MENU_PAL], txtbuf, 0x3F);
+
+                for (int j = 0; j < 3; j++) {
+                    sprintf(txtbuf, "%s", j == menu_select ? "[*]" : "[ ]");
+                    wrtxt(30, menu_pos[j], txtbuf, 0x3F);
+                }
 
                 sprintf(txtbuf, "Mode set: %s", modestr[ttlmode->vmode]);
-                wrtxt(40, 80, txtbuf, 0x3F);
+                wrtxt(menu_posX, 100, txtbuf, 0x3F);
                 sprintf(txtbuf, "hscan   = %d", ttlmode->xscanlrd);
-                wrtxt(40, 90, txtbuf, 0x3F);
-                sprintf(txtbuf, "pal     = %d", ttlmode->pal);
-                wrtxt(40, 100, txtbuf, 0x3F);
+                wrtxt(menu_posX, 110, txtbuf, 0x3F);
 
-                sprintf(txtbuf, "(pal) = %d", pal);
-                wrtxt(40, 120, txtbuf, 0x3F);
+                sleep_ms(200);
 
-                sleep_ms(4000);
+                while (gpio_get(BUTTON_OSD) != 0) {
+
+                    if (gpio_get(BUTTON_PAL) == 0) {
+                        wrtxt(30, menu_pos[menu_select], "[ ]", 0x3F);
+                        menu_select = (menu_select+1) % 3;
+                        wrtxt(30, menu_pos[menu_select], "[*]", 0x3F);
+                    }
+
+                    if (gpio_get(BUTTON_PLS) == 0) {
+                        switch (menu_select)
+                        {
+                            case MENU_CLK : inc_clk();    break;
+                            case MENU_hOFS: inc_hofs();   break;
+                            case MENU_PAL : toggle_pal(); break;
+                        }
+                    }
+                    if (gpio_get(BUTTON_MIN) == 0) {
+                        switch (menu_select)
+                        {
+                            case MENU_CLK : dec_clk();  break;
+                            case MENU_hOFS: dec_hofs(); break;
+                        }
+                    }
+
+                    sprintf(txtbuf, "div  = (%d,%d)  ", ttlmode->div_int, ttlmode->div_frac);
+                    wrtxt(menu_posX, 50, txtbuf, 0x3F);
+                    // CLKkHZ/1e3 / PCLK = 114.0/4=28.5
+                    float pxclk = (114.0f/4.0f)/(ttlmode->div_int + ttlmode->div_frac/256.0f);
+                    sprintf(txtbuf, "pix_clk = %.3fMHz", pxclk);
+                    wrtxt(menu_posX, menu_pos[MENU_CLK], txtbuf, 0x3F);
+                    sprintf(txtbuf, "hoffset = %d   ", ttlmode->h_offset);
+                    wrtxt(menu_posX, menu_pos[MENU_hOFS], txtbuf, 0x3F);
+                    sprintf(txtbuf, "pal     = %d", ttlmode->pal);
+                    wrtxt(menu_posX, menu_pos[MENU_PAL], txtbuf, 0x3F);
+                    sprintf(txtbuf, "hscan   = %d", ttlmode->xscanlrd);
+                    wrtxt(menu_posX, 110, txtbuf, 0x3F);
+
+                    sleep_ms(200);
+                }
+
+                reset_TTLin(_PIO);
+
+                pol_VSYNC > 0 ? ttlIn_Init_Vplus(ttlmode)
+                              : ttlIn_Init_Vminus(ttlmode);
+
+                sleep_ms(100);
+
                 //
                 memset(vga_data_array, 0, FRMBUFSZ);
             }

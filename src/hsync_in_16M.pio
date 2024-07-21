@@ -15,8 +15,10 @@ lineout:
     ; SYNC PULSE
     wait 1 pin 0            ; polarity: +
     wait 0 pin 0 [8]        ; OAK:8,9  ET3000:8
+                            ; BP
+    irq 7
 
-    irq 4                   ; hsync active mode
+    ;irq 4                   ; hsync active mode
     jmp x-- lineout         ; Stay here thru frame active mode
 
 .wrap
