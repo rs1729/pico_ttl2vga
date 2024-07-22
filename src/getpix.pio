@@ -9,10 +9,10 @@ mov y, osr
 
 mov x, y                    ; Initialize counter variable
 
-wait 1 irq 4 [2]            ; Wait for hsync active mode
+wait 1 irq 4 [1]            ; Wait for hsync active mode
 irq clear 7
 
-pixel:
+pixel:                      ; 4 cycles/pixel
     nop
     in pins, 8 [1]
     jmp x-- pixel

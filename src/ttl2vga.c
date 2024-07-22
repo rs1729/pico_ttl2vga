@@ -446,6 +446,7 @@ int main() {
             t0 = -1;
             t1 = 0;
             dt = 0;
+            cnt = 0;
             vm_fail_cnt = 0;
         }
 

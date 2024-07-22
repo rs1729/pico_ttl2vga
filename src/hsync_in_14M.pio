@@ -14,12 +14,13 @@ wait 1 irq 5                ; Wait for vsync active mode
 lineout:
     ; SYNC PULSE
     wait 1 pin 0            ; polarity: +
-    wait 0 pin 0 [30]       ; CGA/EGA: plus additional BP offset
+    irq clear 7
+    wait 0 pin 0 [8]        ; CGA/EGA: plus additional BP offset
                             ; BP CGA/EGA: 35-45 pixel 
-    ;; CGA/EGA 14MHz (15kHz HSYNC)
-    nop [31]
-    nop [31]
     irq 7
+    ;; CGA/EGA 14MHz (15kHz HSYNC)
+    ;nop [31]
+    ;nop [31]
     ;nop [31]
     ;nop [31]
 
@@ -39,7 +40,8 @@ static inline void hsync_in_14M_program_init(PIO pio, uint sm, uint offset, uint
 
     // 14.318MHz  CGA/EGA  //clkdiv=2
     //sm_config_set_clkdiv(&c, 2);
-    sm_config_set_clkdiv_int_frac(&c, div_int, div_frac);
+
+    //sm_config_set_clkdiv_int_frac(&c, div_int, div_frac);
 
     pio_gpio_init(pio, pin);
     gpio_pull_down(pin);

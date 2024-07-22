@@ -14,6 +14,7 @@ wait 1 irq 5                ; Wait for vsync active mode
 lineout:
     ; SYNC PULSE
     wait 1 pin 0            ; polarity: +
+    irq clear 7
     wait 0 pin 0 [8]        ; OAK:8,9  ET3000:8
                             ; BP
     irq 7
@@ -34,7 +35,8 @@ static inline void hsync_in_16M_program_init(PIO pio, uint sm, uint offset, uint
 
     // 16.257MHz  MDA/EGA_Mode2  clkdiv=2
     //sm_config_set_clkdiv(&c, 2);
-    sm_config_set_clkdiv_int_frac(&c, div_int, div_frac);
+
+    //sm_config_set_clkdiv_int_frac(&c, div_int, div_frac);
 
     pio_gpio_init(pio, pin);
     gpio_pull_down(pin);
