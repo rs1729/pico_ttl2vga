@@ -122,7 +122,7 @@ void scan2_in(int pal) {
     for (uint y = 0; y < ttlmode->ylinesrd; y++, n++) {  //n = 0 .. 3*ylinesrd/2
         for (uint x = 0; x < ttlmode->xscanlrd; x+=4) {
             while (pio_sm_is_rx_fifo_empty(_PIO, _SM)) tight_loop_contents();
-            uint32_t col4 = _PIO->rxf[_SM] & 0x3F3F3F3F;
+            uint32_t col4 = _PIO->rxf[_SM] /*& 0x3F3F3F3F*/;
             if (pal)
             {
                 if ( col4 & 0x00000004 ) col4 |= 0x00000015;
@@ -167,7 +167,7 @@ void scan2ega_in(/*int pal*/) {
     for (uint y = 0; y < ttlmode->ylinesrd; y++, n++) {  //n = 0 .. 3*ylinesrd/2
         for (uint x = 0; x < ttlmode->xscanlrd; x+=4) {
             while (pio_sm_is_rx_fifo_empty(_PIO, _SM)) tight_loop_contents();
-            uint32_t col4 = _PIO->rxf[_SM] & 0x3F3F3F3F;
+            uint32_t col4 = _PIO->rxf[_SM] /*& 0x3F3F3F3F*/;
             /*
             if (pal == PAL_CGA)
             {
@@ -214,7 +214,7 @@ void scan2cga_in(/*int pal*/) {
     for (uint y = 0; y < ttlmode->ylinesrd; y++, n++) {  //n = 0 .. 3*ylinesrd/2
         for (uint x = 0; x < ttlmode->xscanlrd; x+=4) {
             while (pio_sm_is_rx_fifo_empty(_PIO, _SM)) tight_loop_contents();
-            uint32_t col4 = _PIO->rxf[_SM] & 0x3F3F3F3F;
+            uint32_t col4 = _PIO->rxf[_SM] /*& 0x3F3F3F3F*/;
             //if (pal == PAL_CGA)
             {
                 if ( col4 & 0x00000004 ) col4 |= 0x00000011;
