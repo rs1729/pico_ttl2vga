@@ -68,7 +68,7 @@ typedef struct {
 // ET3000:(1,222-223..240)
 //V+
 // DIV:(2,77)   // (2,51..122)
-// OAK:(2,51..55..77) , (2,3)=2+3/256 -> 14.167MHz no jitter, line to long due to no h-offset
+// OAK:(2,51..55..77) , (2,3)=2+3/256 (ofs=450) -> 14.167MHz no jitter, line to long ?
 // ET3000:(2,122)
 */
 
@@ -106,8 +106,8 @@ static ttlmode_t mode_CGAEGA = {
     .vmode    = CGAEGA,
     .hline_px = 640,
     .div_int  = 2,
-    .div_frac = 89,
-    .h_offset = 440,
+    .div_frac = 3,  // 77   // OAK: (2,3)=2+3/256 (ofs=450) -> 14.167MHz no jitter
+    .h_offset = 450,
     .prelines = 30,
     .xscanlrd = 640,
     .ylinesrd = 208,
@@ -118,8 +118,8 @@ static ttlmode_t mode_EGA2 = {
     .vmode    = EGA2,
     .hline_px = 640,
     .div_int  = 1,
-    .div_frac = 200,
-    .h_offset = 140,
+    .div_frac = 207,
+    .h_offset = 152,
     .prelines = 2,
     .xscanlrd = 640,
     .ylinesrd = 351,

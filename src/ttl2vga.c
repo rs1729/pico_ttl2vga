@@ -517,7 +517,7 @@ int main() {
             #endif
 
 
-            if (vmode != vmode0 || adj_clk|| toggle_hscan) {
+            if (vmode != vmode0 || adj_clk || toggle_hscan) {
                 //float fq = 1e7/dt;
 
                 adj_clk = 0;
