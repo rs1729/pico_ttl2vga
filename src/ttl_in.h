@@ -53,6 +53,7 @@ typedef struct {
     uint16_t vline_px;
     uint16_t div_int;
     int16_t  div_frac;
+    int16_t  h_offset;
     uint16_t prelines;
     uint16_t xscanlrd;
     uint16_t ylinesrd;
@@ -67,7 +68,7 @@ typedef struct {
 // ET3000:(1,222-223..240)
 //V+
 // DIV:(2,77)   // (2,51..122)
-// OAK:(2,51..55..77) , (2,3)=2+3/256 -> 14.167MHz no jitter, line to long due to no h-offset
+// OAK:(2,51..55..77) , [114MHz] (2,3)=2+3/256 (ofs=450) -> 14.167MHz no jitter, line to long ?
 // ET3000:(2,122)
 */
 
@@ -87,14 +88,16 @@ static char *modestr[] = {
     [EGA2]    = "EGA2"
 };
 
+static const int16_t OFS_STEP = 1;  //8
 
 static ttlmode_t mode_MDA = {
     .vmode    = MDA,
     .hline_px = 720,
-    .div_int  = 1,
-    .div_frac = 232,
+    .div_int  = 3,
+    .div_frac = 42,       //[228MHz] 720px:(3,42)=18.015MHz <-> 640px:(3,143)=16.018MHz
+    .h_offset = 222,
     .prelines = 1,
-    .xscanlrd = 720,  // default:720 , compressed:640
+    .xscanlrd = 720,      // default:720 , compressed:640
     .ylinesrd = 351,
     .pal      = 0
 };
@@ -102,8 +105,9 @@ static ttlmode_t mode_MDA = {
 static ttlmode_t mode_CGAEGA = {
     .vmode    = CGAEGA,
     .hline_px = 640,
-    .div_int  = 2,
-    .div_frac = 77,
+    .div_int  = 4,
+    .div_frac = 6,        // OAK: [228MHz] (4,6)=4+6/256 (ofs=900) -> 14.167MHz no jitter
+    .h_offset = 900,      //912-914
     .prelines = 30,
     .xscanlrd = 640,
     .ylinesrd = 208,
@@ -113,9 +117,10 @@ static ttlmode_t mode_CGAEGA = {
 static ttlmode_t mode_EGA2 = {
     .vmode    = EGA2,
     .hline_px = 640,
-    .div_int  = 1,
-    .div_frac = 207,
-    .prelines = 1,
+    .div_int  = 3,
+    .div_frac = 42,       //[228MHz] (3,42)=18.015MHz , 18.015*640/720=16.013
+    .h_offset = 234,
+    .prelines = 2,
     .xscanlrd = 640,
     .ylinesrd = 351,
     .pal      = 0
@@ -127,6 +132,7 @@ static ttlmode_t mode_MDA640 = {
     .hline_px = 720,
     .div_int  = 2,
     .div_frac = 77,
+    .h_offset = 0,
     .prelines = 1,
     .xscanlrd = 640,
     .ylinesrd = 351
@@ -137,6 +143,7 @@ static ttlmode_t _mode_CGA = {
     .hline_px = 640,
     .div_int  = 2,
     .div_frac = 77,
+    .h_offset = 0,
     .prelines = 30,
     .xscanlrd = 640,
     .ylinesrd = 208
@@ -146,6 +153,7 @@ static ttlmode_t _mode_EGA = {
     .hline_px = 640,
     .div_int  = 2,
     .div_frac = 77,
+    .h_offset = 0,
     .prelines = 30,
     .xscanlrd = 640,
     .ylinesrd = 208

@@ -34,7 +34,7 @@ static inline void rgb_program_init(PIO pio, uint sm, uint offset, uint pin, flo
     // RGB 6 bit out
     sm_config_set_out_pins(&c, pin, 6);
 
-    sm_config_set_clkdiv(&c, clk/4.0); // 4 cycles/pixel , 114MHz/4: 28.5MHz pixel clock
+    sm_config_set_clkdiv(&c, clk/4.0); // 4 cycles/pixel
 
     for (int j = 0; j < 6; j++) {
         pio_gpio_init(pio, pin+j);

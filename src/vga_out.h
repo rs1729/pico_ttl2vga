@@ -37,8 +37,8 @@
 #define RGB_ACTIVE (VGALNBF -1)         // 1 pix/byte
 
 
-#define CLKkHZ 114000  // default: 125000  // 114/4=28.5
-#define PCLK 4
+#define CLKkHZ 228000  // default: 125000  // 228/8=28.5
+#define PCLK 8.0
 
 
 // Length of the pixel array, and number of DMA transfers
