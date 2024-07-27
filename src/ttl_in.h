@@ -62,14 +62,15 @@ typedef struct {
 
 /*
 // DIV = DIV_INT + DIV_FRAC/256
+// [228 MHz]
 //V-
-// DIV:(1,207)  // (1,207..232..240)
-// OAK:EGA2=(1,207), MDA=(1,232) ((1,207) GREEN/BLUE)
-// ET3000:(1,222-223..240)
+// DIV:(3,42)
+// OAK:EGA2=(3,42) ofs=234 , MDA=(3,42) ofs=222
+//// ET3000: vmode detection fails
 //V+
-// DIV:(2,77)   // (2,51..122)
-// OAK:(2,51..55..77) , [114MHz] (2,3)=2+3/256 (ofs=450) -> 14.167MHz no jitter, line to long ?
-// ET3000:(2,122)
+// DIV:(4,6) ofs=900
+// OAK:(4,6)         ,    [114MHz] (2,3)=2+3/256 (ofs=450) -> 14.167MHz no jitter, line to long ?
+// ET3000:   ofs=1587
 */
 
 //enum ega_pins {HSYNC_IN=8, VSYNC_IN, RED2_IN, RED1_IN, GREEN2_IN, GREEN1_IN, BLUE2_IN, BLUE1_IN, GND1, GND2};

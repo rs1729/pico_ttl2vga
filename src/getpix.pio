@@ -33,13 +33,15 @@ static inline void getpix_program_init(PIO pio, uint sm, uint offset, uint pin, 
     sm_config_set_in_pins(&c, pin);
 
 
-    // 14.318MHz  CGA/EGA  114/div=57.272=4*14.318 , div=1.99
-    //OAK:    sm_config_set_clkdiv_int_frac(&c, 2,  55); 
-    //ET3000: sm_config_set_clkdiv_int_frac(&c, 2,  72);
+    // 14.318MHz  CGA/EGA (114/div=57.272=4*14.318 , div=1.99)
+    //                     228/div=57.272=4*14.318 , div=3.981
+    //OAK:    sm_config_set_clkdiv_int_frac(&c, 4,   6); 
+    //ET3000: sm_config_set_clkdiv_int_frac(&c, 4,   6);
 
-    // 16.257MHz  MDA/EGA_Mode2  114/div=65.028=4*16.257 , div=1.753
-    //OAK:    sm_config_set_clkdiv_int_frac(&c, 1, 232); 
-    //ET3000: sm_config_set_clkdiv_int_frac(&c, 1, 240);
+    // 16.257MHz  MDA/EGA_Mode2 (114/div=65.028=4*16.257 , div=1.753)
+    //                           228/div=65.028=4*16.257 , div=3.506
+    //OAK:    sm_config_set_clkdiv_int_frac(&c, 3, 42); 
+    //ET3000: sm_config_set_clkdiv_int_frac(&c, 3, 129);
 
     // 4 instructions / pixel
     sm_config_set_clkdiv_int_frac(&c, div_int, div_frac); // div = div_int + div_frac/256

@@ -103,3 +103,8 @@ Tested only with OAK067 and ET3000 EGA/VGA graphics cards.
    ttlmode_t mode_MDA { .xscanlrd = 640 }
    ```
 
+8. Prototype board<br />
+   ![board](pico_ttl2vga_protopcb1_k.jpg)<br />
+   ![board](lem1ega2.jpg)<br />
+   ![board](lem2ega.jpg)<br />
+
