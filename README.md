@@ -54,21 +54,24 @@ Tested only with OAK067 and ET3000 EGA/VGA graphics cards.
 1. Use at your own risk! Don't expect too much.
 
 2. The 114 MHz system clock reduces jitter in the VGA output.<br />
-   The input pixel clock will probably introduce jitter. The clock divider for the pixel clock can be adjusted (GP20/19). The parameters can be displayed (GP18).<br />
-   Doubling the system clock (228 MHz) helps adjusting the scan pixel clock and offset.
+   The input pixel clock will probably introduce jitter. The clock divider for the pixel clock can be adjusted (GP20/19). The parameters can be displayed `BUTTON_OSD` (GP18).<br />
+   Doubling the system clock speed (228 MHz) helps adjusting the scan pixel clock and offset.
 
 3. If scanning starts too early, the last line would be missing. For normal use, a frame buffer of 720x351 (or 724x351) is recommended (see below). Once the best settings have been found, they can be set in `ttl_in.h`, e.g.
    ```C
    // 228MHz
-   ttlmode_t mode_MDA    { .div_int  = 3, .div_frac =  42, .h_offset = 222 }
-   ttlmode_t mode_EGA2   { .div_int  = 3, .div_frac =  42, .h_offset = 234 }
-   ttlmode_t mode_CGAEGA { .div_int  = 4, .div_frac =   6, .h_offset = 900 }
+   ttlmode_t mode_MDA    { .div_int  = 3, .div_frac =  42, .h_offset =  357 }
+   ttlmode_t mode_EGA2   { .div_int  = 3, .div_frac =  42, .h_offset =  346 }
+   ttlmode_t mode_CGAEGA { .div_int  = 4, .div_frac =   6, .h_offset = 1027 }
    ```
    (can be adjusted using `BUTTON_PLS`/`BUTTON_MIN`)<br />
    For OAK067,
    ```C
+   //OAK
    ttlmode_t mode_CGAEGA { .div_int  = 4, .div_frac =   6 }  // 14.167MHz
    ttlmode_t mode_EGA2   { .div_int  = 3, .div_frac =  42 }  // 18.015MHz (18.015*640/720=16.013)
+   //ET3000
+   //ttlmode_t mode_EGA2 { .div_int  = 3, .div_frac = 129 }  // 16.268MHz
    ```
    shows no/minimal jitter.<br />
    Horizontal offset (scan back porch) can be adjusted by entering the menu `BUTTON_OSD`; select menu point using `BUTTON_PAL`; exit menu by pressing `BUTTON_OSD`.<br />
