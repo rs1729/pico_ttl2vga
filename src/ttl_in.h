@@ -64,13 +64,13 @@ typedef struct {
 // DIV = DIV_INT + DIV_FRAC/256
 // [228 MHz]
 //V-
-// DIV:(3,42)
-// OAK:EGA2=(3,42) ofs=234 , MDA=(3,42) ofs=222
-//// ET3000: vmode detection fails
+// DIV: (3,42)=18.015 , (3,129)=16.268
+// OAK: EGA2=(3,42)     ofs=333 (246 nop[30]), MDA=(3,42) ofs=357 (222 nop[30])
+// ET3000: EGA2=(3,129) ofs=91 (24 nop[30])
 //V+
-// DIV:(4,6) ofs=900
-// OAK:(4,6)         ,    [114MHz] (2,3)=2+3/256 (ofs=450) -> 14.167MHz no jitter, line to long ?
-// ET3000:   ofs=1587
+// DIV: (4,6) ofs=1027 (900 nop[30])
+// OAK: (4,6)          ,    [114MHz] (2,3)=2+3/256 (ofs=450) -> 14.167MHz no jitter, line to long ?
+// ET3000:    ofs=1495 //1587  (1272 nop[30])
 */
 
 //enum ega_pins {HSYNC_IN=8, VSYNC_IN, RED2_IN, RED1_IN, GREEN2_IN, GREEN1_IN, BLUE2_IN, BLUE1_IN, GND1, GND2};
@@ -89,14 +89,14 @@ static char *modestr[] = {
     [EGA2]    = "EGA2"
 };
 
-static const int16_t OFS_STEP = 1;  //8
+static const int16_t OFS_STEP = 1;  //1..2
 
 static ttlmode_t mode_MDA = {
     .vmode    = MDA,
     .hline_px = 720,
     .div_int  = 3,
     .div_frac = 42,       //[228MHz] 720px:(3,42)=18.015MHz <-> 640px:(3,143)=16.018MHz
-    .h_offset = 222,
+    .h_offset = 357,
     .prelines = 1,
     .xscanlrd = 720,      // default:720 , compressed:640
     .ylinesrd = 351,
@@ -108,7 +108,7 @@ static ttlmode_t mode_CGAEGA = {
     .hline_px = 640,
     .div_int  = 4,
     .div_frac = 6,        // OAK: [228MHz] (4,6)=4+6/256 (ofs=900) -> 14.167MHz no jitter
-    .h_offset = 900,      //912-914
+    .h_offset = 1027,      //912-914     // ET3000: ofs=1495
     .prelines = 30,
     .xscanlrd = 640,
     .ylinesrd = 208,
@@ -119,8 +119,8 @@ static ttlmode_t mode_EGA2 = {
     .vmode    = EGA2,
     .hline_px = 640,
     .div_int  = 3,
-    .div_frac = 42,       //[228MHz] (3,42)=18.015MHz , 18.015*640/720=16.013
-    .h_offset = 234,
+    .div_frac = 42,       //[228MHz] OAK: (3, 42)=18.015MHz , 18.015*640/720=16.013
+    .h_offset = 346,      //      ET3000: (3,129)=16.268MHz
     .prelines = 2,
     .xscanlrd = 640,
     .ylinesrd = 351,

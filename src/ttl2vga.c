@@ -16,6 +16,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "pico/stdlib.h"
+#include "pico/multicore.h"
 #include "hardware/pio.h"
 #include "hardware/dma.h"
 
@@ -314,7 +315,7 @@ void dec_clk() {
 
 void inc_hofs() {
     ttlmode->h_offset += OFS_STEP;
-    if (ttlmode->h_offset > 1600) ttlmode->h_offset = 1600;
+    if (ttlmode->h_offset > 2047) ttlmode->h_offset = 2047;
 }
 void dec_hofs() {
     ttlmode->h_offset -= OFS_STEP;
@@ -361,6 +362,28 @@ enum menu_items { MENU_CLK=0, MENU_hOFS, MENU_PAL };
 int menu_pos[] = { 60, 70, 90 };
 int menu_select = 0;
 
+
+uint8_t pol_VSYNC = 0;  // 1:V+ , 0:V-
+
+void core1_pol_VSYNC() {
+    uint32_t avg = 0;
+    uint32_t n = 0;
+    uint8_t avgbuff[5] = {0};
+
+    while (1)
+    {
+        avgbuff[n] = gpio_get(VSYNC_IN);
+        n = (n > 4) ? 0 : n+1;
+
+        // lowpass VSYNC
+        avg = avgbuff[0]+avgbuff[1]+avgbuff[2]+avgbuff[3]+avgbuff[4];
+
+        pol_VSYNC = (avg < 3); //!(avg > 2);
+
+        sleep_ms(227);  // inteference
+    }
+}
+
 int main() {
 
     //uint64_t t0 = -1 //time_us_64()
@@ -376,10 +399,6 @@ int main() {
     int toggle_hscan = 0;
     int adj_clk = 0;
 
-    uint32_t avg = 0;
-    uint32_t n = 0;
-    uint8_t avgbuff[5] = {0};
-    uint8_t pol_VSYNC = 0;  // 1:V+ , 0:V-
     uint8_t cnt = 0;
 
     uint32_t vm_fail_cnt = 0;
@@ -439,6 +458,8 @@ int main() {
 
     sleep_ms(100);
 
+    multicore_launch_core1(core1_pol_VSYNC);
+
     while (1)
     {
         if (vm_fail_cnt > 5) {
@@ -473,14 +494,8 @@ int main() {
             if (dt > 190000 && dt < 227272) hpix = LINE_MDA; // 44Hz..52Hz (+1 cnt)
             else if (dt < 1000000 )         hpix = LINE_EGA; // 54Hz..60Hz (+1 cnt)
 
-            // read VSYNC polarity
+            // VSYNC polarity: core1
             //
-            avgbuff[n] = gpio_get(VSYNC_IN);
-            n = (n > 4) ? 0 : n+1;
-            // lowpass VSYNC
-            avg = avgbuff[0]+avgbuff[1]+avgbuff[2]+avgbuff[3]+avgbuff[4];
-            pol_VSYNC = (avg < 3); //!(avg > 2);
-
             // pol_VSYNC == 0 (-) , hpix == LINE_MDA (V=50Hz)  -->  VID MODE = MDA
             // pol_VSYNC == 0 (-) , hpix == LINE_EGA (V=60Hz)  -->  VID MODE = EGA2
             // pol_VSYNC == 1 (+)                              -->  VID MODE = CGA/EGA

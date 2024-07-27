@@ -37,7 +37,7 @@ pico_generate_pio_header(ttl2vga ${CMAKE_CURRENT_LIST_DIR}/getpix.pio)
 target_sources(ttl2vga PRIVATE ttl2vga.c vga_out.c ttl_in_16M.c ttl_in_14M.c)
 
 # must match with executable name
-target_link_libraries(ttl2vga PRIVATE pico_stdlib hardware_pio hardware_dma)
+target_link_libraries(ttl2vga PRIVATE pico_stdlib pico_multicore hardware_pio hardware_dma)
 
 # must match with executable name
 pico_add_extra_outputs(ttl2vga)

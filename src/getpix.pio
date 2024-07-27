@@ -12,7 +12,7 @@ mov x, y                    ; Initialize counter variable
 wait 1 irq 4 [1]            ; Wait for hsync active mode
 irq clear 7
 
-nop [30]
+;nop [30]
 
 pixel:                      ; 4 cycles/pixel
     nop
