@@ -1,5 +1,5 @@
 
-.program hsync_in_14M
+.program hsync_in
 
 
 pull block                  ; Pull from FIFO to OSR (only once)
@@ -15,14 +15,9 @@ lineout:
     ; SYNC PULSE
     wait 1 pin 0            ; polarity: +
     irq clear 7
-    wait 0 pin 0 [8]        ; CGA/EGA: plus additional BP offset
-                            ; BP CGA/EGA: 35-45 pixel 
+    wait 0 pin 0 [8]        ; OAK:8,9  ET3000:8
+                            ; BP
     irq 7
-    ;; CGA/EGA 14MHz (15kHz HSYNC)
-    ;nop [31]
-    ;nop [31]
-    ;nop [31]
-    ;nop [31]
 
     ;irq 4                   ; hsync active mode
     jmp x-- lineout         ; Stay here thru frame active mode
@@ -32,16 +27,11 @@ lineout:
 
 
 % c-sdk {
-static inline void hsync_in_14M_program_init(PIO pio, uint sm, uint offset, uint pin, uint16_t div_int, uint8_t div_frac) {
+static inline void hsync_in_program_init(PIO pio, uint sm, uint offset, uint pin) {
 
-    pio_sm_config c = hsync_in_14M_program_get_default_config(offset);
+    pio_sm_config c = hsync_in_program_get_default_config(offset);
 
     sm_config_set_in_pins(&c, pin);
-
-    // 14.318MHz  CGA/EGA  //clkdiv=2
-    //sm_config_set_clkdiv(&c, 2);
-
-    //sm_config_set_clkdiv_int_frac(&c, div_int, div_frac);
 
     pio_gpio_init(pio, pin);
     gpio_pull_down(pin);

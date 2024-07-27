@@ -25,12 +25,9 @@ pico_generate_pio_header(ttl2vga ${CMAKE_CURRENT_LIST_DIR}/hsync_out.pio)
 pico_generate_pio_header(ttl2vga ${CMAKE_CURRENT_LIST_DIR}/vsync_out.pio)
 pico_generate_pio_header(ttl2vga ${CMAKE_CURRENT_LIST_DIR}/rgb_out.pio)
 
-pico_generate_pio_header(ttl2vga ${CMAKE_CURRENT_LIST_DIR}/hsync_in_16M.pio)
+pico_generate_pio_header(ttl2vga ${CMAKE_CURRENT_LIST_DIR}/hsync_in.pio)
 pico_generate_pio_header(ttl2vga ${CMAKE_CURRENT_LIST_DIR}/vsync_in_16M.pio)
-
-pico_generate_pio_header(ttl2vga ${CMAKE_CURRENT_LIST_DIR}/hsync_in_14M.pio)
 pico_generate_pio_header(ttl2vga ${CMAKE_CURRENT_LIST_DIR}/vsync_in_14M.pio)
-
 pico_generate_pio_header(ttl2vga ${CMAKE_CURRENT_LIST_DIR}/getpix.pio)
 
 # must match with executable name and source file names

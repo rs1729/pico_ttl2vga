@@ -3,7 +3,7 @@
 #include "pico/stdlib.h"
 #include "hardware/pio.h"
 
-#include "hsync_in_16M.pio.h"
+#include "hsync_in.pio.h"
 #include "vsync_in_16M.pio.h"
 #include "getpix.pio.h"
 
@@ -17,7 +17,7 @@ void ttlIn_Init_Vminus(ttlmode_t *ttlmode) {
 
     PIO pio = pio1;
 
-    uint hsync_offset = pio_add_program(pio, &hsync_in_16M_program);
+    uint hsync_offset = pio_add_program(pio, &hsync_in_program);
     uint vsync_offset = pio_add_program(pio, &vsync_in_16M_program);
     uint getpx_offset = pio_add_program(pio, &getpix_program);
 
@@ -25,7 +25,7 @@ void ttlIn_Init_Vminus(ttlmode_t *ttlmode) {
     uint vsync_sm = 1;
     uint getpx_sm = 2;
 
-    hsync_in_16M_program_init(pio, hsync_sm, hsync_offset, HSYNC_IN, ttlmode->div_int, ttlmode->div_frac);
+    hsync_in_program_init(pio, hsync_sm, hsync_offset, HSYNC_IN);
     vsync_in_16M_program_init(pio, vsync_sm, vsync_offset, VSYNC_IN);
     getpix_program_init(pio, getpx_sm, getpx_offset, RED2_IN, ttlmode->div_int, ttlmode->div_frac);
 
