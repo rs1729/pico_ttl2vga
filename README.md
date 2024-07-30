@@ -55,7 +55,14 @@ Tested only with OAK067 and ET3000 EGA/VGA graphics cards.
 
 2. The 114 MHz system clock reduces jitter in the VGA output.<br />
    The input pixel clock will probably introduce jitter. The clock divider for the pixel clock can be adjusted (GP20/19). The parameters can be displayed `BUTTON_OSD` (GP18).<br />
-   Doubling the system clock speed (228 MHz) helps adjusting the scan pixel clock and offset.
+   Doubling the system clock speed (228 MHz) helps adjusting the scan pixel clock and offset.<br />
+   To reduce jitter, pixels must be sampled at the right time/position.<br />
+   `BUTTON_OSD`: Enter menu<br />
+   ![CGAEGA_MENU](cgaega_menu_600.jpg)<br />
+   `BUTTON_PAL`: Toggle menu item<br />
+   `BUTTON_PLS`/`BUTTON_MIN`: Change value<br />
+   `BUTTON_OSD`: Leave menu<br />
+   Pixel clock and horizontal offset can also be change outside the menu.
 
 3. If scanning starts too early, the last line would be missing. For normal use, a frame buffer of 720x351 (or 724x351) is recommended (see below). Once the best settings have been found, they can be set in `ttl_in.h`, e.g.
    ```C
@@ -74,7 +81,7 @@ Tested only with OAK067 and ET3000 EGA/VGA graphics cards.
    //ttlmode_t mode_EGA2 { .div_int  = 3, .div_frac = 129 }  // 16.268MHz
    ```
    shows no/minimal jitter.<br />
-   Horizontal offset (scan back porch) can be adjusted by entering the menu `BUTTON_OSD`; select menu point using `BUTTON_PAL`; exit menu by pressing `BUTTON_OSD`.<br />
+   Horizontal offset (scan back porch) can be adjusted by entering the menu `BUTTON_OSD`; select menu item using `BUTTON_PAL`; exit menu by pressing `BUTTON_OSD`.<br />
    In EGA Mode 2 there should be 350 visible lines, 13 lines vertical sync, and 364 total lines, i.e. not much room for front/back porch.<br />
    640x350 EGA Mode 2:<br />
    ![EGA2_640x350](EGA2_640x350.png)<br />
@@ -108,6 +115,6 @@ Tested only with OAK067 and ET3000 EGA/VGA graphics cards.
 
 8. Prototype board<br />
    ![board](pico_ttl2vga_protopcb1_k.jpg)<br />
-   ![board](lem1ega2.jpg)<br />
-   ![board](lem2ega.jpg)<br />
+   ![Lemmings_EGA2](lem1ega2.jpg)<br />
+   ![Lemmings_EGA](lem2ega.jpg)<br />
 
