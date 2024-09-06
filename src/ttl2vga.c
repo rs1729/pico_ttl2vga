@@ -19,6 +19,7 @@
 #include "pico/multicore.h"
 #include "hardware/pio.h"
 #include "hardware/dma.h"
+#include "hardware/clocks.h"
 
 #include "vga_out.h"
 #include "ttl_in.h"
