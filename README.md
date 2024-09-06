@@ -44,6 +44,10 @@ Tested only with OAK067 and ET3000 EGA/VGA graphics cards.
   cmake .. -DPICO_SDK_PATH=<path_to_pico_sdk>
   make
   ```
+  If Pico 2 (SDK 2.0) is the target, add `-DPICO_BOARD=pico2` to `cmake`, i.e.
+  ```
+  cmake .. -DPICO_SDK_PATH=<path_to_pico_sdk> -DPICO_BOARD=pico2
+  ```
 
 #### Pico VGA output
 
