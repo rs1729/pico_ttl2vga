@@ -1,6 +1,8 @@
 PICO TTL2VGA
 ==
 
+Latest updates, more precise pixel clock and offset, see [pico228MHz_VpolCore1](https://github.com/rs1729/pico_ttl2vga/tree/pico228MHz_VpolCore1) branch.
+
 ### RPi Pico  TTL to VGA Converter  
 
 Simple TTL (MDA/CGA/EGA) to VGA converter based on RPi Pico.<br />
