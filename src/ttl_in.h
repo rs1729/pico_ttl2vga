@@ -102,7 +102,7 @@ static ttlmode_t mode_MDA = {
     .ylinesrd = 351,
     .pal      = 0
 };
-
+/*
 static ttlmode_t mode_CGAEGA = {
     .vmode    = CGAEGA,
     .hline_px = 640,
@@ -112,7 +112,19 @@ static ttlmode_t mode_CGAEGA = {
     .prelines = 30,
     .xscanlrd = 640,
     .ylinesrd = 208,
-    .pal      = 0
+    .pal      = 0      // CGA: .par = 1
+};
+*/
+static ttlmode_t mode_CGAEGA = {
+    .vmode    = CGAEGA,
+    .hline_px = 640,
+    .div_int  = 3,     // DIV=(3,251)->14.320MHz
+    .div_frac = 251,
+    .h_offset = 1872,  // rp2040/pico: 1872 , rp2350/pico2: 1582
+    .prelines = 30,
+    .xscanlrd = 640,
+    .ylinesrd = 208,
+    .pal      = 0      // CGA: .par = 1
 };
 
 static ttlmode_t mode_EGA2 = {
@@ -136,18 +148,20 @@ static ttlmode_t mode_MDA640 = {
     .h_offset = 0,
     .prelines = 1,
     .xscanlrd = 640,
-    .ylinesrd = 351
+    .ylinesrd = 351,
+    .pal      = 0
 };
 
 static ttlmode_t _mode_CGA = {
     .vmode    = CGAEGA,
     .hline_px = 640,
-    .div_int  = 2,
-    .div_frac = 77,
-    .h_offset = 0,
+    .div_int  = 3,     // DIV=(3,251)->14.320MHz
+    .div_frac = 251,
+    .h_offset = 1872,
     .prelines = 30,
     .xscanlrd = 640,
-    .ylinesrd = 208
+    .ylinesrd = 208,
+    .pal      = 1
 };
 static ttlmode_t _mode_EGA = {
     .vmode    = CGAEGA,
@@ -157,7 +171,8 @@ static ttlmode_t _mode_EGA = {
     .h_offset = 0,
     .prelines = 30,
     .xscanlrd = 640,
-    .ylinesrd = 208
+    .ylinesrd = 208,
+    .pal      = 0
 };
 */
 

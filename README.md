@@ -16,7 +16,7 @@ Input video modes:<br />
 Using the buttons, the pixel clock (horizontal width) can be adjusted.
 In MDA and CGA/EGA the pallete can be toggled (GP21).
 
-Tested only with OAK067 and ET3000 EGA/VGA graphics cards.
+Tested with OAK067 and ET3000 EGA/VGA graphics cards, and two CGA cards.
 
 #### Parts
 
@@ -121,4 +121,20 @@ Tested only with OAK067 and ET3000 EGA/VGA graphics cards.
    ![board](pico_ttl2vga_protopcb1_k.jpg)<br />
    ![Lemmings_EGA2](lem1ega2.jpg)<br />
    ![Lemmings_EGA](lem2ega.jpg)<br />
+
+9. CGA<br />
+   Tested two CGA cards, both have precise 14.318 MHz pixel clock and 59.923 Hz vertical sync. Hence
+   ```C
+   //CGA
+   ttlmode_t mode_CGA { .div_int  = 3, .div_frac = 251 }  // 14.320MHz
+   ```
+   With the right horizontal offset there is no jitter/shimmer.
+   In textmode, card A needed `.h_offset = 1872` (rp2040/pico) or `.h_offset = 1582` (rp2350/pico2).
+   The best offset for card B was `.h_offset = 1848` (rp2040/pico).<br />
+   640x200 CGA:<br />
+   ![CGA_640x200](CGA_640x200.png)<br />
+
+10. Replacing the voltage dividers with a 74LVC245 did not make much difference.
+   One of the CGA cards showed a floating pin 7 (reserved), and the 74LVC245 output was a constant logic 1. However, in EGA pin 7 is secondary blue, and the converter does not distinguish between CGA and EGA, leading to a blue background. A 10k pull-down resistor at pin 7 TTL input solved the problem.
+   If the Pico input pins are 5V tolerant, no level shifter is needed.
 
